@@ -1,0 +1,650 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Employee Portal - Attendance</title>
+    <link rel="stylesheet" href="css/style.css">
+    <link rel="stylesheet" href="css/mobile.css">
+    <link href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0/css/all.min.css" rel="stylesheet">
+</head>
+<body class="dashboard">
+    <!-- Header -->
+    <header class="header">
+        <div class="header-left">
+            <h1 class="header-title">EMPLOYEE PORTAL</h1>
+        </div>
+        <div class="header-right">
+            <button class="notification-btn" onclick="toggleNotifications()">
+                <i class="fas fa-bell"></i>
+                <span class="notification-badge" id="notificationBadge"></span>
+            </button>
+            <div class="user-menu" onclick="toggleUserMenu()">
+                <div class="user-avatar">JD</div>
+                <span class="user-name">John Doe</span>
+                <i class="fas fa-chevron-down"></i>
+            </div>
+        </div>
+    </header>
+
+    <!-- Main Layout -->
+    <div class="main-layout">
+        <!-- Sidebar -->
+        <aside class="sidebar">
+            <nav class="nav-menu">
+                <div class="nav-item">
+                    <a href="employee-dashboard.html" class="nav-link">
+                        <i class="fas fa-home"></i>
+                        <span>Dashboard</span>
+                    </a>
+                </div>
+                <div class="nav-item">
+                    <a href="attendance.html" class="nav-link active">
+                        <i class="fas fa-clock"></i>
+                        <span>Attendance</span>
+                    </a>
+                </div>
+                <div class="nav-item">
+                    <a href="training.html" class="nav-link">
+                        <i class="fas fa-graduation-cap"></i>
+                        <span>Training Center</span>
+                    </a>
+                </div>
+                <div class="nav-item">
+                    <a href="#" class="nav-link" onclick="showTasks()">
+                        <i class="fas fa-tasks"></i>
+                        <span>Tasks</span>
+                    </a>
+                </div>
+                <div class="nav-item">
+                    <a href="#" class="nav-link" onclick="showProfile()">
+                        <i class="fas fa-user"></i>
+                        <span>Profile</span>
+                    </a>
+                </div>
+                <div class="nav-item">
+                    <a href="#" class="nav-link logout-btn">
+                        <i class="fas fa-sign-out-alt"></i>
+                        <span>Logout</span>
+                    </a>
+                </div>
+            </nav>
+        </aside>
+
+        <!-- Main Content -->
+        <main class="main-content">
+            <!-- Page Header -->
+            <div class="page-header">
+                <h1 class="page-title">Attendance Management</h1>
+                <p class="page-subtitle">Track your work hours and manage attendance</p>
+            </div>
+
+            <!-- Today's Attendance -->
+            <div class="dashboard-grid">
+                <!-- Check In/Out Card -->
+                <div class="card">
+                    <div class="card-header">
+                        <h3 class="card-title">Today's Attendance</h3>
+                        <div class="card-icon primary-icon">
+                            <i class="fas fa-clock"></i>
+                        </div>
+                    </div>
+                    <div class="attendance-status">
+                        <div class="status-badge" id="attendanceStatus">
+                            <span class="badge badge-danger">
+                                <i class="fas fa-circle"></i>
+                                Not Checked In
+                            </span>
+                        </div>
+                        <div class="current-time" id="currentTime">
+                            Loading...
+                        </div>
+                    </div>
+                    <div class="attendance-actions">
+                        <button class="btn btn-primary btn-lg" id="checkInBtn" onclick="attendanceManager.checkIn()">
+                            <i class="fas fa-sign-in-alt"></i>
+                            Check In
+                        </button>
+                        <button class="btn btn-danger btn-lg" id="checkOutBtn" onclick="attendanceManager.checkOut()" style="display: none;">
+                            <i class="fas fa-sign-out-alt"></i>
+                            Check Out
+                        </button>
+                    </div>
+                </div>
+
+                <!-- Break Timer -->
+                <div class="card">
+                    <div class="card-header">
+                        <h3 class="card-title">Break Management</h3>
+                        <div class="card-icon warning-icon">
+                            <i class="fas fa-pause"></i>
+                        </div>
+                    </div>
+                    <div class="break-timer">
+                        <div class="timer-display" id="breakTimer">00:00:00</div>
+                        <div class="timer-status" id="breakStatus">Not on break</div>
+                    </div>
+                    <div class="break-actions">
+                        <button class="btn btn-warning" id="startBreakBtn" onclick="attendanceManager.startBreak()">
+                            <i class="fas fa-pause"></i>
+                            Start Break
+                        </button>
+                        <button class="btn btn-success" id="endBreakBtn" onclick="attendanceManager.endBreak()" style="display: none;">
+                            <i class="fas fa-play"></i>
+                            End Break
+                        </button>
+                    </div>
+                </div>
+
+                <!-- Work Hours Summary -->
+                <div class="card">
+                    <div class="card-header">
+                        <h3 class="card-title">Work Hours</h3>
+                        <div class="card-icon success-icon">
+                            <i class="fas fa-chart-line"></i>
+                        </div>
+                    </div>
+                    <div class="hours-summary">
+                        <div class="hour-item">
+                            <div class="hour-label">Check In Time</div>
+                            <div class="hour-value" id="checkInTime">--:--</div>
+                        </div>
+                        <div class="hour-item">
+                            <div class="hour-label">Check Out Time</div>
+                            <div class="hour-value" id="checkOutTime">--:--</div>
+                        </div>
+                        <div class="hour-item">
+                            <div class="hour-label">Total Work Time</div>
+                            <div class="hour-value" id="totalWorkTime">0h 0m</div>
+                        </div>
+                        <div class="hour-item">
+                            <div class="hour-label">Break Time</div>
+                            <div class="hour-value" id="totalBreakTime">0m</div>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- Live Timer -->
+                <div class="card">
+                    <div class="card-header">
+                        <h3 class="card-title">Live Work Timer</h3>
+                    </div>
+                    <div class="live-timer-container">
+                        <div class="timer-circle">
+                            <svg class="timer-svg" viewBox="0 0 100 100">
+                                <circle cx="50" cy="50" r="45" stroke="#e5e7eb" stroke-width="8" fill="none"/>
+                                <circle id="workTimerProgress" cx="50" cy="50" r="45" stroke="#4f46e5" stroke-width="8" 
+                                        fill="none" stroke-dasharray="283" stroke-dashoffset="283" 
+                                        stroke-linecap="round" transform="rotate(-90 50 50)"/>
+                            </svg>
+                            <div class="timer-content">
+                                <div class="timer-time" id="liveWorkTimer">00:00:00</div>
+                                <div class="timer-label">Active Time</div>
+                            </div>
+                        </div>
+                        <div class="timer-info">
+                            <div class="info-item">
+                                <span class="info-label">Target:</span>
+                                <span class="info-value">8 hours</span>
+                            </div>
+                            <div class="info-item">
+                                <span class="info-label">Progress:</span>
+                                <span class="info-value" id="progressPercentage">0%</span>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- Quick Stats -->
+                <div class="card">
+                    <div class="card-header">
+                        <h3 class="card-title">This Month</h3>
+                        <div class="card-icon info-icon">
+                            <i class="fas fa-calendar"></i>
+                        </div>
+                    </div>
+                    <div class="quick-stats">
+                        <div class="stat-row">
+                            <span class="stat-label">Days Present</span>
+                            <span class="stat-value" id="monthlyPresent">18</span>
+                        </div>
+                        <div class="stat-row">
+                            <span class="stat-label">Days Absent</span>
+                            <span class="stat-value" id="monthlyAbsent">2</span>
+                        </div>
+                        <div class="stat-row">
+                            <span class="stat-label">Total Hours</span>
+                            <span class="stat-value" id="monthlyHours">156h</span>
+                        </div>
+                        <div class="stat-row">
+                            <span class="stat-label">Attendance %</span>
+                            <span class="stat-value text-success" id="monthlyPercentage">90%</span>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- Recent Activity -->
+                <div class="card">
+                    <div class="card-header">
+                        <h3 class="card-title">Recent Activity</h3>
+                        <button class="btn btn-sm btn-outline" onclick="showAllActivity()">
+                            View All
+                        </button>
+                    </div>
+                    <div class="activity-list" id="recentActivity">
+                        <div class="activity-item">
+                            <div class="activity-time">09:00 AM</div>
+                            <div class="activity-content">
+                                <i class="fas fa-sign-in-alt text-success"></i>
+                                <span>Checked in</span>
+                            </div>
+                        </div>
+                        <div class="activity-item">
+                            <div class="activity-time">12:00 PM</div>
+                            <div class="activity-content">
+                                <i class="fas fa-pause text-warning"></i>
+                                <span>Break started</span>
+                            </div>
+                        </div>
+                        <div class="activity-item">
+                            <div class="activity-time">01:00 PM</div>
+                            <div class="activity-content">
+                                <i class="fas fa-play text-success"></i>
+                                <span>Break ended</span>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+
+            <!-- Attendance Calendar -->
+            <div class="card mt-30">
+                <div class="card-header">
+                    <h3 class="card-title">Attendance Calendar</h3>
+                    <div class="calendar-controls">
+                        <select class="form-control" id="monthSelector" onchange="changeCalendarMonth()">
+                            <option value="0">January</option>
+                            <option value="1">February</option>
+                            <option value="2">March</option>
+                            <option value="3">April</option>
+                            <option value="4">May</option>
+                            <option value="5" selected>June</option>
+                            <option value="6">July</option>
+                            <option value="7">August</option>
+                            <option value="8">September</option>
+                            <option value="9">October</option>
+                            <option value="10">November</option>
+                            <option value="11">December</option>
+                        </select>
+                        <select class="form-control" id="yearSelector" onchange="changeCalendarYear()">
+                            <option value="2023">2023</option>
+                            <option value="2024" selected>2024</option>
+                            <option value="2025">2025</option>
+                        </select>
+                    </div>
+                </div>
+                <div id="attendanceCalendar" class="attendance-calendar">
+                    <!-- Calendar will be generated here -->
+                </div>
+            </div>
+
+            <!-- Attendance History -->
+            <div class="card mt-30">
+                <div class="card-header">
+                    <h3 class="card-title">Attendance History</h3>
+                    <div class="card-actions">
+                        <input type="date" class="form-control" id="startDate" style="width: auto;">
+                        <span>to</span>
+                        <input type="date" class="form-control" id="endDate" style="width: auto;">
+                        <button class="btn btn-primary" onclick="filterAttendanceHistory()">
+                            <i class="fas fa-search"></i>
+                            Filter
+                        </button>
+                        <button class="btn btn-success" onclick="exportAttendance()">
+                            <i class="fas fa-download"></i>
+                            Export
+                        </button>
+                    </div>
+                </div>
+                <div class="table-container">
+                    <table class="table" id="attendanceHistoryTable">
+                        <thead>
+                            <tr>
+                                <th>Date</th>
+                                <th>Check In</th>
+                                <th>Check Out</th>
+                                <th>Work Hours</th>
+                                <th>Break Time</th>
+                                <th>Status</th>
+                                <th>Actions</th>
+                            </tr>
+                        </thead>
+                        <tbody id="attendanceHistoryBody">
+                            <tr>
+                                <td>June 10, 2024</td>
+                                <td>09:00 AM</td>
+                                <td>06:00 PM</td>
+                                <td>8h 30m</td>
+                                <td>30m</td>
+                                <td><span class="badge badge-success">Present</span></td>
+                                <td>
+                                    <button class="btn btn-sm btn-outline" onclick="viewAttendanceDetails('2024-06-10')">
+                                        <i class="fas fa-eye"></i>
+                                        View
+                                    </button>
+                                </td>
+                            </tr>
+                            <tr>
+                                <td>June 11, 2024</td>
+                                <td>09:15 AM</td>
+                                <td>05:45 PM</td>
+                                <td>8h 00m</td>
+                                <td>30m</td>
+                                <td><span class="badge badge-warning">Late</span></td>
+                                <td>
+                                    <button class="btn btn-sm btn-outline" onclick="viewAttendanceDetails('2024-06-11')">
+                                        <i class="fas fa-eye"></i>
+                                        View
+                                    </button>
+                                </td>
+                            </tr>
+                            <tr>
+                                <td>June 12, 2024</td>
+                                <td>--</td>
+                                <td>--</td>
+                                <td>0h 0m</td>
+                                <td>0m</td>
+                                <td><span class="badge badge-danger">Absent</span></td>
+                                <td>
+                                    <button class="btn btn-sm btn-outline" onclick="viewAttendanceDetails('2024-06-12')">
+                                        <i class="fas fa-eye"></i>
+                                        View
+                                    </button>
+                                </td>
+                            </tr>
+                        </tbody>
+                    </table>
+                </div>
+            </div>
+        </main>
+    </div>
+
+    <!-- User Menu Dropdown -->
+    <div id="userMenuDropdown" class="dropdown-menu">
+        <a href="#" onclick="showProfile()">
+            <i class="fas fa-user"></i>
+            My Profile
+        </a>
+        <a href="#" onclick="showSettings()">
+            <i class="fas fa-cog"></i>
+            Settings
+        </a>
+        <hr>
+        <a href="#" class="logout-btn">
+            <i class="fas fa-sign-out-alt"></i>
+            Logout
+        </a>
+    </div>
+
+    <!-- Attendance Details Modal -->
+    <div id="attendanceDetailsModal" class="modal-overlay">
+        <div class="modal-content">
+            <div class="modal-header">
+                <h3>Attendance Details</h3>
+                <button class="modal-close" onclick="closeModal('attendanceDetailsModal')">
+                    <i class="fas fa-times"></i>
+                </button>
+            </div>
+            <div class="modal-body" id="attendanceDetailsContent">
+                <!-- Attendance details will be loaded here -->
+            </div>
+        </div>
+    </div>
+
+    <!-- Scripts -->
+    <script src="https://unpkg.com/@supabase/supabase-js@2"></script>
+    <script src="js/supabase-config.js"></script>
+    <script src="js/auth.js"></script>
+    <script src="js/utils.js"></script>
+    <script src="js/attendance.js"></script>
+    
+    <script>
+        // Attendance page specific functions
+        document.addEventListener('DOMContentLoaded', async () => {
+            await checkAuth();
+            initializeAttendancePage();
+            updateCurrentTime();
+            initializeCalendar();
+            loadAttendanceHistory();
+        });
+
+        function initializeAttendancePage() {
+            const userData = JSON.parse(localStorage.getItem('currentUser') || '{}');
+            document.querySelector('.user-name').textContent = userData.name || 'User';
+            document.querySelector('.user-avatar').textContent = StringUtils.getInitials(userData.name || 'User');
+            
+            // Set default date range for history
+            const today = new Date();
+            const lastWeek = new Date();
+            lastWeek.setDate(today.getDate() - 7);
+            
+            document.getElementById('startDate').value = DateTimeUtils.formatDate(lastWeek, 'YYYY-MM-DD');
+            document.getElementById('endDate').value = DateTimeUtils.formatDate(today, 'YYYY-MM-DD');
+        }
+
+        function updateCurrentTime() {
+            setInterval(() => {
+                const now = new Date();
+                document.getElementById('currentTime').textContent = now.toLocaleTimeString('en-US', {
+                    hour: '2-digit',
+                    minute: '2-digit',
+                    second: '2-digit'
+                });
+            }, 1000);
+        }
+
+        function initializeCalendar() {
+            if (typeof AttendanceCalendar !== 'undefined') {
+                window.attendanceCalendar = new AttendanceCalendar('attendanceCalendar');
+            }
+        }
+
+        function changeCalendarMonth() {
+            const month = document.getElementById('monthSelector').value;
+            const year = document.getElementById('yearSelector').value;
+            
+            if (window.attendanceCalendar) {
+                window.attendanceCalendar.currentDate = new Date(year, month, 1);
+                window.attendanceCalendar.loadAttendanceData().then(() => {
+                    window.attendanceCalendar.render();
+                });
+            }
+        }
+
+        function changeCalendarYear() {
+            changeCalendarMonth(); // Same logic
+        }
+
+        async function loadAttendanceHistory() {
+            const startDate = document.getElementById('startDate').value;
+            const endDate = document.getElementById('endDate').value;
+            
+            if (!startDate || !endDate) return;
+            
+            try {
+                if (typeof attendanceManager !== 'undefined') {
+                    const history = await attendanceManager.getAttendanceHistory(startDate, endDate);
+                    displayAttendanceHistory(history);
+                }
+            } catch (error) {
+                console.error('Error loading attendance history:', error);
+                showNotification('Error loading attendance history', 'error');
+            }
+        }
+
+        function displayAttendanceHistory(history) {
+            const tbody = document.getElementById('attendanceHistoryBody');
+            
+            if (history.length === 0) {
+                tbody.innerHTML = `
+                    <tr>
+                        <td colspan="7" class="text-center text-muted">
+                            No attendance records found for the selected period
+                        </td>
+                    </tr>
+                `;
+                return;
+            }
+            
+            tbody.innerHTML = history.map(record => `
+                <tr>
+                    <td>${DateTimeUtils.formatDate(record.date, 'long')}</td>
+                    <td>${record.check_in ? DateTimeUtils.formatTime(record.check_in) : '--'}</td>
+                    <td>${record.check_out ? DateTimeUtils.formatTime(record.check_out) : '--'}</td>
+                    <td>${record.total_hours ? attendanceManager.formatHours(record.total_hours) : '0h 0m'}</td>
+                    <td>${record.break_time ? Math.round(record.break_time) + 'm' : '0m'}</td>
+                    <td>
+                        <span class="badge badge-${getStatusBadgeClass(record.status)}">
+                            ${StringUtils.titleCase(record.status)}
+                        </span>
+                    </td>
+                    <td>
+                        <button class="btn btn-sm btn-outline" onclick="viewAttendanceDetails('${record.date}')">
+                            <i class="fas fa-eye"></i>
+                            View
+                        </button>
+                    </td>
+                </tr>
+            `).join('');
+        }
+
+        function getStatusBadgeClass(status) {
+            switch(status) {
+                case 'present': return 'success';
+                case 'absent': return 'danger';
+                case 'late': return 'warning';
+                case 'half-day': return 'info';
+                default: return 'secondary';
+            }
+        }
+
+        function filterAttendanceHistory() {
+            loadAttendanceHistory();
+        }
+
+        function viewAttendanceDetails(date) {
+            // Mock attendance details - replace with real data
+            const details = `
+                <div class="attendance-detail">
+                    <h4>Attendance for ${DateTimeUtils.formatDate(date, 'long')}</h4>
+                    <div class="detail-grid">
+                        <div class="detail-item">
+                            <label>Check In:</label>
+                            <span>09:00 AM</span>
+                        </div>
+                        <div class="detail-item">
+                            <label>Check Out:</label>
+                            <span>06:00 PM</span>
+                        </div>
+                        <div class="detail-item">
+                            <label>Total Work Time:</label>
+                            <span>8h 30m</span>
+                        </div>
+                        <div class="detail-item">
+                            <label>Break Time:</label>
+                            <span>30m</span>
+                        </div>
+                        <div class="detail-item">
+                            <label>Status:</label>
+                            <span class="badge badge-success">Present</span>
+                        </div>
+                        <div class="detail-item">
+                            <label>Location:</label>
+                            <span>Office</span>
+                        </div>
+                    </div>
+                    
+                    <h5 class="mt-20">Break Sessions</h5>
+                    <div class="break-sessions">
+                        <div class="break-session">
+                            <span>12:00 PM - 12:30 PM</span>
+                            <span class="break-duration">30 minutes</span>
+                        </div>
+                    </div>
+                </div>
+            `;
+            
+            document.getElementById('attendanceDetailsContent').innerHTML = details;
+            document.getElementById('attendanceDetailsModal').style.display = 'flex';
+        }
+
+        function exportAttendance() {
+            const startDate = document.getElementById('startDate').value;
+            const endDate = document.getElementById('endDate').value;
+            
+            if (!startDate || !endDate) {
+                showNotification('Please select date range first', 'warning');
+                return;
+            }
+            
+            // Mock export functionality
+            UIUtils.showLoading('Preparing export...');
+            
+            setTimeout(() => {
+                UIUtils.hideLoading();
+                showNotification('Attendance report exported successfully!', 'success');
+                
+                // In real implementation, this would download a CSV/PDF file
+                const csvContent = `Date,Check In,Check Out,Work Hours,Break Time,Status
+June 10 2024,09:00 AM,06:00 PM,8h 30m,30m,Present
+June 11 2024,09:15 AM,05:45 PM,8h 00m,30m,Late`;
+                
+                downloadFile(csvContent, `attendance_${startDate}_to_${endDate}.csv`, 'text/csv');
+            }, 2000);
+        }
+
+        function closeModal(modalId) {
+            document.getElementById(modalId).style.display = 'none';
+        }
+
+        function showAllActivity() {
+            showNotification('Activity log feature coming soon!', 'info');
+        }
+
+        function showTasks() {
+            showNotification('Tasks feature coming soon!', 'info');
+        }
+
+        function showProfile() {
+            showNotification('Profile feature coming soon!', 'info');
+        }
+
+        function showSettings() {
+            showNotification('Settings feature coming soon!', 'info');
+        }
+
+        function toggleNotifications() {
+            showNotification('Notifications feature coming soon!', 'info');
+        }
+
+        function toggleUserMenu() {
+            const dropdown = document.getElementById('userMenuDropdown');
+            dropdown.classList.toggle('active');
+        }
+
+        // Close dropdowns when clicking outside
+        document.addEventListener('click', (e) => {
+            if (!e.target.closest('.user-menu')) {
+                document.getElementById('userMenuDropdown').classList.remove('active');
+            }
+        });
+
+        // Close modals when clicking outside
+        document.addEventListener('click', (e) => {
+            if (e.target.classList.contains('modal-overlay')) {
+                e.target.style.display = 'none';
+            }
+        });
+    </script>
+</body>
+</html>
