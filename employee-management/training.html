@@ -1,0 +1,812 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Employee Portal - Training Center</title>
+    <link rel="stylesheet" href="css/style.css">
+    <link rel="stylesheet" href="css/mobile.css">
+    <link href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0/css/all.min.css" rel="stylesheet">
+</head>
+<body class="dashboard">
+    <!-- Header -->
+    <header class="header">
+        <div class="header-left">
+            <h1 class="header-title">EMPLOYEE PORTAL</h1>
+        </div>
+        <div class="header-right">
+            <button class="notification-btn" onclick="toggleNotifications()">
+                <i class="fas fa-bell"></i>
+                <span class="notification-badge" id="notificationBadge">2</span>
+            </button>
+            <div class="user-menu" onclick="toggleUserMenu()">
+                <div class="user-avatar">JD</div>
+                <span class="user-name">John Doe</span>
+                <i class="fas fa-chevron-down"></i>
+            </div>
+        </div>
+    </header>
+
+    <!-- Main Layout -->
+    <div class="main-layout">
+        <!-- Sidebar -->
+        <aside class="sidebar">
+            <nav class="nav-menu">
+                <div class="nav-item">
+                    <a href="employee-dashboard.html" class="nav-link">
+                        <i class="fas fa-home"></i>
+                        <span>Dashboard</span>
+                    </a>
+                </div>
+                <div class="nav-item">
+                    <a href="attendance.html" class="nav-link">
+                        <i class="fas fa-clock"></i>
+                        <span>Attendance</span>
+                    </a>
+                </div>
+                <div class="nav-item">
+                    <a href="training.html" class="nav-link active">
+                        <i class="fas fa-graduation-cap"></i>
+                        <span>Training Center</span>
+                    </a>
+                </div>
+                <div class="nav-item">
+                    <a href="#" class="nav-link" onclick="showTasks()">
+                        <i class="fas fa-tasks"></i>
+                        <span>Tasks</span>
+                    </a>
+                </div>
+                <div class="nav-item">
+                    <a href="#" class="nav-link" onclick="showProfile()">
+                        <i class="fas fa-user"></i>
+                        <span>Profile</span>
+                    </a>
+                </div>
+                <div class="nav-item">
+                    <a href="#" class="nav-link logout-btn">
+                        <i class="fas fa-sign-out-alt"></i>
+                        <span>Logout</span>
+                    </a>
+                </div>
+            </nav>
+        </aside>
+
+        <!-- Main Content -->
+        <main class="main-content">
+            <!-- Page Header -->
+            <div class="page-header">
+                <h1 class="page-title">Training Center</h1>
+                <p class="page-subtitle">Enhance your skills with our comprehensive training programs</p>
+            </div>
+
+            <!-- Training Overview -->
+            <div class="dashboard-grid">
+                <!-- Overall Progress -->
+                <div class="card">
+                    <div class="card-header">
+                        <h3 class="card-title">Overall Progress</h3>
+                        <div class="card-icon success-icon">
+                            <i class="fas fa-chart-pie"></i>
+                        </div>
+                    </div>
+                    <div class="progress-overview">
+                        <div class="progress-circle-large">
+                            <svg viewBox="0 0 100 100">
+                                <circle cx="50" cy="50" r="40" stroke="#e5e7eb" stroke-width="8" fill="none"/>
+                                <circle cx="50" cy="50" r="40" stroke="#10b981" stroke-width="8" 
+                                        fill="none" stroke-dasharray="251" stroke-dashoffset="62.75" 
+                                        stroke-linecap="round" transform="rotate(-90 50 50)"/>
+                            </svg>
+                            <div class="progress-content">
+                                <div class="progress-value">75%</div>
+                                <div class="progress-label">Complete</div>
+                            </div>
+                        </div>
+                        <div class="progress-stats">
+                            <div class="stat-item">
+                                <span class="stat-number">8</span>
+                                <span class="stat-label">Completed</span>
+                            </div>
+                            <div class="stat-item">
+                                <span class="stat-number">2</span>
+                                <span class="stat-label">In Progress</span>
+                            </div>
+                            <div class="stat-item">
+                                <span class="stat-number">3</span>
+                                <span class="stat-label">Pending</span>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- Current Course -->
+                <div class="card">
+                    <div class="card-header">
+                        <h3 class="card-title">Current Course</h3>
+                        <div class="card-icon primary-icon">
+                            <i class="fas fa-play-circle"></i>
+                        </div>
+                    </div>
+                    <div class="current-course">
+                        <div class="course-thumbnail">
+                            <i class="fas fa-laptop-code"></i>
+                        </div>
+                        <div class="course-info">
+                            <h4>JavaScript Fundamentals</h4>
+                            <p>Learn the basics of JavaScript programming</p>
+                            <div class="course-progress">
+                                <div class="progress-bar">
+                                    <div class="progress-fill" style="width: 65%"></div>
+                                </div>
+                                <span class="progress-text">65% Complete</span>
+                            </div>
+                            <button class="btn btn-primary mt-15" onclick="continueCourse('js-fundamentals')">
+                                <i class="fas fa-play"></i>
+                                Continue Learning
+                            </button>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- Achievements -->
+                <div class="card">
+                    <div class="card-header">
+                        <h3 class="card-title">Recent Achievements</h3>
+                        <div class="card-icon warning-icon">
+                            <i class="fas fa-trophy"></i>
+                        </div>
+                    </div>
+                    <div class="achievements-list">
+                        <div class="achievement-item">
+                            <div class="achievement-icon">
+                                <i class="fas fa-medal"></i>
+                            </div>
+                            <div class="achievement-content">
+                                <h4>Quick Learner</h4>
+                                <p>Completed 3 courses this month</p>
+                            </div>
+                        </div>
+                        <div class="achievement-item">
+                            <div class="achievement-icon">
+                                <i class="fas fa-star"></i>
+                            </div>
+                            <div class="achievement-content">
+                                <h4>Perfect Score</h4>
+                                <p>Scored 100% in React Basics quiz</p>
+                            </div>
+                        </div>
+                        <div class="achievement-item">
+                            <div class="achievement-icon">
+                                <i class="fas fa-fire"></i>
+                            </div>
+                            <div class="achievement-content">
+                                <h4>7 Day Streak</h4>
+                                <p>Learned for 7 consecutive days</p>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- Learning Path -->
+                <div class="card">
+                    <div class="card-header">
+                        <h3 class="card-title">Recommended Path</h3>
+                        <div class="card-icon info-icon">
+                            <i class="fas fa-route"></i>
+                        </div>
+                    </div>
+                    <div class="learning-path">
+                        <div class="path-step completed">
+                            <div class="step-number">1</div>
+                            <div class="step-content">
+                                <h4>HTML Basics</h4>
+                                <span class="badge badge-success">Completed</span>
+                            </div>
+                        </div>
+                        <div class="path-step completed">
+                            <div class="step-number">2</div>
+                            <div class="step-content">
+                                <h4>CSS Fundamentals</h4>
+                                <span class="badge badge-success">Completed</span>
+                            </div>
+                        </div>
+                        <div class="path-step current">
+                            <div class="step-number">3</div>
+                            <div class="step-content">
+                                <h4>JavaScript Basics</h4>
+                                <span class="badge badge-warning">In Progress</span>
+                            </div>
+                        </div>
+                        <div class="path-step">
+                            <div class="step-number">4</div>
+                            <div class="step-content">
+                                <h4>React Framework</h4>
+                                <span class="badge badge-secondary">Locked</span>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+
+            <!-- Course Categories -->
+            <div class="section-header">
+                <h2>Course Categories</h2>
+                <div class="category-filters">
+                    <button class="filter-btn active" onclick="filterCourses('all')">All</button>
+                    <button class="filter-btn" onclick="filterCourses('programming')">Programming</button>
+                    <button class="filter-btn" onclick="filterCourses('design')">Design</button>
+                    <button class="filter-btn" onclick="filterCourses('business')">Business</button>
+                    <button class="filter-btn" onclick="filterCourses('soft-skills')">Soft Skills</button>
+                </div>
+            </div>
+
+            <!-- Available Courses -->
+            <div class="courses-grid" id="coursesGrid">
+                <!-- Programming Courses -->
+                <div class="course-card" data-category="programming">
+                    <div class="course-thumbnail">
+                        <i class="fab fa-js-square"></i>
+                        <div class="course-duration">4h 30m</div>
+                    </div>
+                    <div class="course-content">
+                        <div class="course-meta">
+                            <span class="course-level beginner">Beginner</span>
+                            <span class="course-rating">
+                                <i class="fas fa-star"></i> 4.8
+                            </span>
+                        </div>
+                        <h3 class="course-title">JavaScript Fundamentals</h3>
+                        <p class="course-description">Learn the core concepts of JavaScript programming language</p>
+                        <div class="course-progress">
+                            <div class="progress-bar">
+                                <div class="progress-fill" style="width: 65%"></div>
+                            </div>
+                            <span class="progress-text">65% Complete</span>
+                        </div>
+                        <div class="course-actions">
+                            <button class="btn btn-primary" onclick="startCourse('js-fundamentals')">
+                                <i class="fas fa-play"></i>
+                                Continue
+                            </button>
+                            <button class="btn btn-outline" onclick="viewCourseDetails('js-fundamentals')">
+                                <i class="fas fa-info"></i>
+                                Details
+                            </button>
+                        </div>
+                    </div>
+                </div>
+
+                <div class="course-card" data-category="programming">
+                    <div class="course-thumbnail">
+                        <i class="fab fa-react"></i>
+                        <div class="course-duration">6h 15m</div>
+                    </div>
+                    <div class="course-content">
+                        <div class="course-meta">
+                            <span class="course-level intermediate">Intermediate</span>
+                            <span class="course-rating">
+                                <i class="fas fa-star"></i> 4.9
+                            </span>
+                        </div>
+                        <h3 class="course-title">React Development</h3>
+                        <p class="course-description">Build modern web applications with React framework</p>
+                        <div class="course-status locked">
+                            <i class="fas fa-lock"></i>
+                            <span>Complete JavaScript first</span>
+                        </div>
+                        <div class="course-actions">
+                            <button class="btn btn-outline" disabled>
+                                <i class="fas fa-lock"></i>
+                                Locked
+                            </button>
+                        </div>
+                    </div>
+                </div>
+
+                <div class="course-card" data-category="design">
+                    <div class="course-thumbnail">
+                        <i class="fas fa-palette"></i>
+                        <div class="course-duration">3h 45m</div>
+                    </div>
+                    <div class="course-content">
+                        <div class="course-meta">
+                            <span class="course-level beginner">Beginner</span>
+                            <span class="course-rating">
+                                <i class="fas fa-star"></i> 4.7
+                            </span>
+                        </div>
+                        <h3 class="course-title">UI/UX Design Basics</h3>
+                        <p class="course-description">Learn the fundamentals of user interface and experience design</p>
+                        <div class="course-progress">
+                            <div class="progress-bar">
+                                <div class="progress-fill" style="width: 100%"></div>
+                            </div>
+                            <span class="progress-text">Completed</span>
+                        </div>
+                        <div class="course-actions">
+                            <button class="btn btn-success">
+                                <i class="fas fa-check"></i>
+                                Completed
+                            </button>
+                            <button class="btn btn-outline" onclick="downloadCertificate('ui-ux-basics')">
+                                <i class="fas fa-certificate"></i>
+                                Certificate
+                            </button>
+                        </div>
+                    </div>
+                </div>
+
+                <div class="course-card" data-category="business">
+                    <div class="course-thumbnail">
+                        <i class="fas fa-chart-line"></i>
+                        <div class="course-duration">2h 20m</div>
+                    </div>
+                    <div class="course-content">
+                        <div class="course-meta">
+                            <span class="course-level beginner">Beginner</span>
+                            <span class="course-rating">
+                                <i class="fas fa-star"></i> 4.6
+                            </span>
+                        </div>
+                        <h3 class="course-title">Project Management</h3>
+                        <p class="course-description">Essential project management skills for modern workplace</p>
+                        <div class="course-actions">
+                            <button class="btn btn-primary" onclick="startCourse('project-management')">
+                                <i class="fas fa-play"></i>
+                                Start Course
+                            </button>
+                            <button class="btn btn-outline" onclick="viewCourseDetails('project-management')">
+                                <i class="fas fa-info"></i>
+                                Details
+                            </button>
+                        </div>
+                    </div>
+                </div>
+
+                <div class="course-card" data-category="soft-skills">
+                    <div class="course-thumbnail">
+                        <i class="fas fa-comments"></i>
+                        <div class="course-duration">1h 50m</div>
+                    </div>
+                    <div class="course-content">
+                        <div class="course-meta">
+                            <span class="course-level beginner">Beginner</span>
+                            <span class="course-rating">
+                                <i class="fas fa-star"></i> 4.8
+                            </span>
+                        </div>
+                        <h3 class="course-title">Communication Skills</h3>
+                        <p class="course-description">Improve your workplace communication and presentation skills</p>
+                        <div class="course-progress">
+                            <div class="progress-bar">
+                                <div class="progress-fill" style="width: 30%"></div>
+                            </div>
+                            <span class="progress-text">30% Complete</span>
+                        </div>
+                        <div class="course-actions">
+                            <button class="btn btn-primary" onclick="startCourse('communication-skills')">
+                                <i class="fas fa-play"></i>
+                                Continue
+                            </button>
+                            <button class="btn btn-outline" onclick="viewCourseDetails('communication-skills')">
+                                <i class="fas fa-info"></i>
+                                Details
+                            </button>
+                        </div>
+                    </div>
+                </div>
+
+                <div class="course-card" data-category="programming">
+                    <div class="course-thumbnail">
+                        <i class="fab fa-python"></i>
+                        <div class="course-duration">5h 10m</div>
+                    </div>
+                    <div class="course-content">
+                        <div class="course-meta">
+                            <span class="course-level intermediate">Intermediate</span>
+                            <span class="course-rating">
+                                <i class="fas fa-star"></i> 4.9
+                            </span>
+                        </div>
+                        <h3 class="course-title">Python Programming</h3>
+                        <p class="course-description">Master Python programming for data analysis and automation</p>
+                        <div class="course-actions">
+                            <button class="btn btn-primary" onclick="startCourse('python-programming')">
+                                <i class="fas fa-play"></i>
+                                Start Course
+                            </button>
+                            <button class="btn btn-outline" onclick="viewCourseDetails('python-programming')">
+                                <i class="fas fa-info"></i>
+                                Details
+                            </button>
+                        </div>
+                    </div>
+                </div>
+            </div>
+
+            <!-- Certificates Section -->
+            <div class="card mt-30">
+                <div class="card-header">
+                    <h3 class="card-title">My Certificates</h3>
+                    <button class="btn btn-sm btn-outline" onclick="viewAllCertificates()">
+                        <i class="fas fa-certificate"></i>
+                        View All
+                    </button>
+                </div>
+                <div class="certificates-grid">
+                    <div class="certificate-card">
+                        <div class="certificate-icon">
+                            <i class="fas fa-certificate"></i>
+                        </div>
+                        <div class="certificate-content">
+                            <h4>UI/UX Design Basics</h4>
+                            <p>Completed on June 15, 2024</p>
+                            <div class="certificate-actions">
+                                <button class="btn btn-sm btn-primary" onclick="downloadCertificate('ui-ux-basics')">
+                                    <i class="fas fa-download"></i>
+                                    Download
+                                </button>
+                                <button class="btn btn-sm btn-outline" onclick="shareCertificate('ui-ux-basics')">
+                                    <i class="fas fa-share"></i>
+                                    Share
+                                </button>
+                            </div>
+                        </div>
+                    </div>
+                    
+                    <div class="certificate-card">
+                        <div class="certificate-icon">
+                            <i class="fas fa-certificate"></i>
+                        </div>
+                        <div class="certificate-content">
+                            <h4>HTML & CSS Fundamentals</h4>
+                            <p>Completed on June 10, 2024</p>
+                            <div class="certificate-actions">
+                                <button class="btn btn-sm btn-primary" onclick="downloadCertificate('html-css-basics')">
+                                    <i class="fas fa-download"></i>
+                                    Download
+                                </button>
+                                <button class="btn btn-sm btn-outline" onclick="shareCertificate('html-css-basics')">
+                                    <i class="fas fa-share"></i>
+                                    Share
+                                </button>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </main>
+    </div>
+
+    <!-- User Menu Dropdown -->
+    <div id="userMenuDropdown" class="dropdown-menu">
+        <a href="#" onclick="showProfile()">
+            <i class="fas fa-user"></i>
+            My Profile
+        </a>
+        <a href="#" onclick="showSettings()">
+            <i class="fas fa-cog"></i>
+            Settings
+        </a>
+        <hr>
+        <a href="#" class="logout-btn">
+            <i class="fas fa-sign-out-alt"></i>
+            Logout
+        </a>
+    </div>
+
+    <!-- Course Details Modal -->
+    <div id="courseDetailsModal" class="modal-overlay">
+        <div class="modal-content large">
+            <div class="modal-header">
+                <h3 id="courseModalTitle">Course Details</h3>
+                <button class="modal-close" onclick="closeModal('courseDetailsModal')">
+                    <i class="fas fa-times"></i>
+                </button>
+            </div>
+            <div class="modal-body" id="courseDetailsContent">
+                <!-- Course details will be loaded here -->
+            </div>
+        </div>
+    </div>
+
+    <!-- Video Player Modal -->
+    <div id="videoPlayerModal" class="modal-overlay">
+        <div class="modal-content video-modal">
+            <div class="modal-header">
+                <h3 id="videoTitle">Course Video</h3>
+                <button class="modal-close" onclick="closeModal('videoPlayerModal')">
+                    <i class="fas fa-times"></i>
+                </button>
+            </div>
+            <div class="modal-body">
+                <div class="video-container">
+                    <div class="video-placeholder">
+                        <i class="fas fa-play-circle"></i>
+                        <p>Video content would be loaded here</p>
+                        <p class="text-muted">Integration with video platforms like YouTube, Vimeo, or custom video player</p>
+                    </div>
+                </div>
+                <div class="video-controls">
+                    <button class="btn btn-outline" onclick="previousVideo()">
+                        <i class="fas fa-backward"></i>
+                        Previous
+                    </button>
+                    <button class="btn btn-primary" onclick="markVideoComplete()">
+                        <i class="fas fa-check"></i>
+                        Mark Complete
+                    </button>
+                    <button class="btn btn-outline" onclick="nextVideo()">
+                        <i class="fas fa-forward"></i>
+                        Next
+                    </button>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- Scripts -->
+    <script src="https://unpkg.com/@supabase/supabase-js@2"></script>
+    <script src="js/supabase-config.js"></script>
+    <script src="js/auth.js"></script>
+    <script src="js/utils.js"></script>
+    <script src="js/training.js"></script>
+    
+    <script>
+        // Training page specific functions
+        document.addEventListener('DOMContentLoaded', async () => {
+            await checkAuth();
+            initializeTrainingPage();
+            loadUserProgress();
+        });
+
+        function initializeTrainingPage() {
+            const userData = JSON.parse(localStorage.getItem('currentUser') || '{}');
+            document.querySelector('.user-name').textContent = userData.name || 'User';
+            document.querySelector('.user-avatar').textContent = StringUtils.getInitials(userData.name || 'User');
+        }
+
+        function loadUserProgress() {
+            // Mock progress data - replace with real API calls
+            console.log('Loading user training progress...');
+        }
+
+        // Course filtering
+        function filterCourses(category) {
+            const cards = document.querySelectorAll('.course-card');
+            const buttons = document.querySelectorAll('.filter-btn');
+            
+            // Update active button
+            buttons.forEach(btn => btn.classList.remove('active'));
+            event.target.classList.add('active');
+            
+            // Filter cards
+            cards.forEach(card => {
+                if (category === 'all' || card.dataset.category === category) {
+                    card.style.display = 'block';
+                } else {
+                    card.style.display = 'none';
+                }
+            });
+        }
+
+        // Course actions
+        function startCourse(courseId) {
+            showNotification(`Starting course: ${courseId}`, 'info');
+            // In real implementation, this would navigate to the course content
+            openVideoPlayer(courseId);
+        }
+
+        function continueCourse(courseId) {
+            showNotification(`Continuing course: ${courseId}`, 'info');
+            openVideoPlayer(courseId);
+        }
+
+        function viewCourseDetails(courseId) {
+            const courseDetails = getCourseDetails(courseId);
+            document.getElementById('courseModalTitle').textContent = courseDetails.title;
+            document.getElementById('courseDetailsContent').innerHTML = courseDetails.content;
+            document.getElementById('courseDetailsModal').style.display = 'flex';
+        }
+
+        function getCourseDetails(courseId) {
+            // Mock course details - replace with real data
+            const courses = {
+                'js-fundamentals': {
+                    title: 'JavaScript Fundamentals',
+                    content: `
+                        <div class="course-detail-content">
+                            <div class="course-overview">
+                                <h4>Course Overview</h4>
+                                <p>This comprehensive course covers the fundamental concepts of JavaScript programming language. You'll learn variables, functions, objects, and modern ES6+ features.</p>
+                            </div>
+                            
+                            <div class="course-curriculum">
+                                <h4>Curriculum</h4>
+                                <div class="curriculum-list">
+                                    <div class="lesson-item completed">
+                                        <i class="fas fa-check-circle"></i>
+                                        <span>Introduction to JavaScript</span>
+                                        <span class="lesson-duration">15 min</span>
+                                    </div>
+                                    <div class="lesson-item completed">
+                                        <i class="fas fa-check-circle"></i>
+                                        <span>Variables and Data Types</span>
+                                        <span class="lesson-duration">25 min</span>
+                                    </div>
+                                    <div class="lesson-item current">
+                                        <i class="fas fa-play-circle"></i>
+                                        <span>Functions and Scope</span>
+                                        <span class="lesson-duration">30 min</span>
+                                    </div>
+                                    <div class="lesson-item">
+                                        <i class="fas fa-circle"></i>
+                                        <span>Objects and Arrays</span>
+                                        <span class="lesson-duration">35 min</span>
+                                    </div>
+                                    <div class="lesson-item">
+                                        <i class="fas fa-circle"></i>
+                                        <span>DOM Manipulation</span>
+                                        <span class="lesson-duration">40 min</span>
+                                    </div>
+                                </div>
+                            </div>
+                            
+                            <div class="course-actions">
+                                <button class="btn btn-primary" onclick="startCourse('js-fundamentals')">
+                                    <i class="fas fa-play"></i>
+                                    Continue Learning
+                                </button>
+                            </div>
+                        </div>
+                    `
+                },
+                'project-management': {
+                    title: 'Project Management Essentials',
+                    content: `
+                        <div class="course-detail-content">
+                            <div class="course-overview">
+                                <h4>Course Overview</h4>
+                                <p>Learn essential project management skills including planning, execution, monitoring, and closing projects successfully.</p>
+                            </div>
+                            
+                            <div class="course-curriculum">
+                                <h4>Curriculum</h4>
+                                <div class="curriculum-list">
+                                    <div class="lesson-item">
+                                        <i class="fas fa-circle"></i>
+                                        <span>Introduction to Project Management</span>
+                                        <span class="lesson-duration">20 min</span>
+                                    </div>
+                                    <div class="lesson-item">
+                                        <i class="fas fa-circle"></i>
+                                        <span>Project Planning</span>
+                                        <span class="lesson-duration">30 min</span>
+                                    </div>
+                                    <div class="lesson-item">
+                                        <i class="fas fa-circle"></i>
+                                        <span>Risk Management</span>
+                                        <span class="lesson-duration">25 min</span>
+                                    </div>
+                                    <div class="lesson-item">
+                                        <i class="fas fa-circle"></i>
+                                        <span>Team Leadership</span>
+                                        <span class="lesson-duration">35 min</span>
+                                    </div>
+                                </div>
+                            </div>
+                            
+                            <div class="course-actions">
+                                <button class="btn btn-primary" onclick="startCourse('project-management')">
+                                    <i class="fas fa-play"></i>
+                                    Start Course
+                                </button>
+                            </div>
+                        </div>
+                    `
+                }
+            };
+            
+            return courses[courseId] || { title: 'Course Details', content: '<p>Course details not found.</p>' };
+        }
+
+        function openVideoPlayer(courseId) {
+            document.getElementById('videoTitle').textContent = `Learning: ${courseId}`;
+            document.getElementById('videoPlayerModal').style.display = 'flex';
+        }
+
+        // Video player controls
+        function previousVideo() {
+            showNotification('Previous video loaded', 'info');
+        }
+
+        function nextVideo() {
+            showNotification('Next video loaded', 'info');
+        }
+
+        function markVideoComplete() {
+            showNotification('Video marked as complete!', 'success');
+        }
+
+        // Certificate functions
+        function downloadCertificate(courseId) {
+            UIUtils.showLoading('Generating certificate...');
+            
+            setTimeout(() => {
+                UIUtils.hideLoading();
+                showNotification('Certificate downloaded successfully!', 'success');
+                
+                // Mock certificate download
+                const certificateData = `
+                    CERTIFICATE OF COMPLETION
+                    
+                    This is to certify that John Doe has successfully completed
+                    the course: ${courseId}
+                    
+                    Date: ${new Date().toLocaleDateString()}
+                    Employee Management System
+                `;
+                
+                downloadFile(certificateData, `certificate_${courseId}.txt`, 'text/plain');
+            }, 2000);
+        }
+
+        function shareCertificate(courseId) {
+            if (navigator.share) {
+                navigator.share({
+                    title: 'My Certificate',
+                    text: `I just completed ${courseId} course!`,
+                    url: window.location.href
+                });
+            } else {
+                copyToClipboard(`I just completed ${courseId} course! Check it out at ${window.location.href}`);
+            }
+        }
+
+        function viewAllCertificates() {
+            showNotification('Certificate gallery feature coming soon!', 'info');
+        }
+
+        // Modal functions
+        function closeModal(modalId) {
+            document.getElementById(modalId).style.display = 'none';
+        }
+
+        // Navigation functions
+        function showTasks() {
+            showNotification('Tasks feature coming soon!', 'info');
+        }
+
+        function showProfile() {
+            showNotification('Profile feature coming soon!', 'info');
+        }
+
+        function showSettings() {
+            showNotification('Settings feature coming soon!', 'info');
+        }
+
+        function toggleNotifications() {
+            showNotification('Notifications feature coming soon!', 'info');
+        }
+
+        function toggleUserMenu() {
+            const dropdown = document.getElementById('userMenuDropdown');
+            dropdown.classList.toggle('active');
+        }
+
+        // Close dropdowns when clicking outside
+        document.addEventListener('click', (e) => {
+            if (!e.target.closest('.user-menu')) {
+                document.getElementById('userMenuDropdown').classList.remove('active');
+            }
+        });
+
+        // Close modals when clicking outside
+        document.addEventListener('click', (e) => {
+            if (e.target.classList.contains('modal-overlay')) {
+                e.target.style.display = 'none';
+            }
+        });
+    </script>
+</body>
+</html>
