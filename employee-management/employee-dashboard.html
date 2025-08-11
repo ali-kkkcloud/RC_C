@@ -1,0 +1,638 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Employee Portal - Dashboard</title>
+    <link rel="stylesheet" href="css/style.css">
+    <link rel="stylesheet" href="css/mobile.css">
+    <link href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0/css/all.min.css" rel="stylesheet">
+</head>
+<body class="dashboard">
+    <!-- Header -->
+    <header class="header">
+        <div class="header-left">
+            <h1 class="header-title">EMPLOYEE PORTAL</h1>
+        </div>
+        <div class="header-right">
+            <button class="notification-btn" onclick="toggleNotifications()">
+                <i class="fas fa-bell"></i>
+                <span class="notification-badge" id="notificationBadge"></span>
+            </button>
+            <div class="user-menu" onclick="toggleUserMenu()">
+                <div class="user-avatar">JD</div>
+                <span class="user-name">John Doe</span>
+                <i class="fas fa-chevron-down"></i>
+            </div>
+        </div>
+    </header>
+
+    <!-- Main Layout -->
+    <div class="main-layout">
+        <!-- Sidebar -->
+        <aside class="sidebar">
+            <nav class="nav-menu">
+                <div class="nav-item">
+                    <a href="employee-dashboard.html" class="nav-link active">
+                        <i class="fas fa-home"></i>
+                        <span>Dashboard</span>
+                    </a>
+                </div>
+                <div class="nav-item">
+                    <a href="attendance.html" class="nav-link">
+                        <i class="fas fa-clock"></i>
+                        <span>Attendance</span>
+                    </a>
+                </div>
+                <div class="nav-item">
+                    <a href="training.html" class="nav-link">
+                        <i class="fas fa-graduation-cap"></i>
+                        <span>Training Center</span>
+                    </a>
+                </div>
+                <div class="nav-item">
+                    <a href="#" class="nav-link" onclick="showTasks()">
+                        <i class="fas fa-tasks"></i>
+                        <span>Tasks</span>
+                    </a>
+                </div>
+                <div class="nav-item">
+                    <a href="#" class="nav-link" onclick="showProfile()">
+                        <i class="fas fa-user"></i>
+                        <span>Profile</span>
+                    </a>
+                </div>
+                <div class="nav-item">
+                    <a href="#" class="nav-link logout-btn">
+                        <i class="fas fa-sign-out-alt"></i>
+                        <span>Logout</span>
+                    </a>
+                </div>
+            </nav>
+        </aside>
+
+        <!-- Main Content -->
+        <main class="main-content">
+            <!-- Page Header -->
+            <div class="page-header">
+                <h1 class="page-title">Welcome back, <span id="userName">John</span></h1>
+                <p class="page-subtitle">Here is what's happening today</p>
+            </div>
+
+            <!-- Dashboard Grid -->
+            <div class="dashboard-grid">
+                <!-- Current Shift Card -->
+                <div class="card">
+                    <div class="card-header">
+                        <h3 class="card-title">Current Shift</h3>
+                        <div class="card-icon primary-icon">
+                            <i class="fas fa-clock"></i>
+                        </div>
+                    </div>
+                    <div class="stats-value" id="currentTime">09:44:12</div>
+                    <div class="stats-label">
+                        <span class="badge badge-success" id="shiftStatus">
+                            <i class="fas fa-circle"></i>
+                            On Shift
+                        </span>
+                    </div>
+                    <div class="mt-20">
+                        <button class="btn btn-primary" id="attendanceBtn" onclick="toggleAttendance()">
+                            <i class="fas fa-sign-in-alt"></i>
+                            Check In
+                        </button>
+                    </div>
+                </div>
+
+                <!-- Today's Schedule -->
+                <div class="card">
+                    <div class="card-header">
+                        <h3 class="card-title">Today's Schedule</h3>
+                        <div class="card-icon info-icon">
+                            <i class="fas fa-calendar"></i>
+                        </div>
+                    </div>
+                    <div class="schedule-list" id="scheduleList">
+                        <div class="schedule-item">
+                            <div class="schedule-time">
+                                <span class="badge badge-info">09:00-10:00</span>
+                            </div>
+                            <div class="schedule-content">
+                                <strong>Weekly Team Meeting</strong>
+                                <p>Conference Room A</p>
+                            </div>
+                        </div>
+                        <div class="schedule-item">
+                            <div class="schedule-time">
+                                <span class="badge badge-success">11:00-12:30</span>
+                            </div>
+                            <div class="schedule-content">
+                                <strong>Client Call</strong>
+                                <p>Video Conference</p>
+                            </div>
+                        </div>
+                        <div class="schedule-item">
+                            <div class="schedule-time">
+                                <span class="badge badge-warning">13:00-17:00</span>
+                            </div>
+                            <div class="schedule-content">
+                                <strong>Project Work</strong>
+                                <p>Development Tasks</p>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- Training Status -->
+                <div class="card">
+                    <div class="card-header">
+                        <h3 class="card-title">Training Status</h3>
+                        <div class="card-icon warning-icon">
+                            <i class="fas fa-graduation-cap"></i>
+                        </div>
+                    </div>
+                    <div class="training-progress">
+                        <div class="progress-item">
+                            <div class="progress-header">
+                                <span>New Employee Onboarding</span>
+                                <span class="progress-percent">75%</span>
+                            </div>
+                            <div class="progress-bar">
+                                <div class="progress-fill" style="width: 75%"></div>
+                            </div>
+                            <small class="text-muted">Complete by Jun 30</small>
+                        </div>
+                    </div>
+                    <div class="mt-20">
+                        <a href="training.html" class="btn btn-outline">
+                            <i class="fas fa-play"></i>
+                            Continue Training
+                        </a>
+                    </div>
+                </div>
+
+                <!-- Live Shift Timer -->
+                <div class="card">
+                    <div class="card-header">
+                        <h3 class="card-title">Live Shift Timer</h3>
+                    </div>
+                    <div class="timer-container">
+                        <div class="timer-circle">
+                            <svg class="timer-svg" viewBox="0 0 100 100">
+                                <circle cx="50" cy="50" r="45" stroke="#e5e7eb" stroke-width="10" fill="none"/>
+                                <circle id="timerProgress" cx="50" cy="50" r="45" stroke="#4f46e5" stroke-width="10" 
+                                        fill="none" stroke-dasharray="283" stroke-dashoffset="70" 
+                                        stroke-linecap="round" transform="rotate(-90 50 50)"/>
+                            </svg>
+                            <div class="timer-content">
+                                <div class="timer-time" id="shiftTimer">01:15:38</div>
+                            </div>
+                        </div>
+                        <div class="timer-controls">
+                            <button class="btn btn-outline btn-sm" id="breakBtn" onclick="toggleBreak()">
+                                <i class="fas fa-pause"></i>
+                                Break
+                            </button>
+                            <button class="btn btn-primary btn-sm" id="resumeBtn" onclick="resumeWork()" style="display: none;">
+                                <i class="fas fa-play"></i>
+                                Resume
+                            </button>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- Attendance Calendar -->
+                <div class="card">
+                    <div class="card-header">
+                        <h3 class="card-title">Attendance</h3>
+                        <div class="calendar-nav">
+                            <button onclick="previousMonth()" class="btn-icon">
+                                <i class="fas fa-chevron-left"></i>
+                            </button>
+                            <span id="currentMonth">June 2024</span>
+                            <button onclick="nextMonth()" class="btn-icon">
+                                <i class="fas fa-chevron-right"></i>
+                            </button>
+                        </div>
+                    </div>
+                    <div class="calendar-container">
+                        <div class="calendar-grid">
+                            <div class="calendar-header">
+                                <div>Su</div><div>Mo</div><div>Tu</div><div>We</div>
+                                <div>Th</div><div>Fr</div><div>Sa</div>
+                            </div>
+                            <div class="calendar-body" id="calendarBody">
+                                <!-- Calendar days will be generated by JavaScript -->
+                            </div>
+                        </div>
+                        <div class="calendar-legend">
+                            <div class="legend-item">
+                                <span class="legend-dot present"></span>
+                                <span>Present</span>
+                            </div>
+                            <div class="legend-item">
+                                <span class="legend-dot absent"></span>
+                                <span>Absent</span>
+                            </div>
+                            <div class="legend-item">
+                                <span class="legend-dot half-day"></span>
+                                <span>Half Day</span>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- Quick Tasks -->
+                <div class="card">
+                    <div class="card-header">
+                        <h3 class="card-title">Tasks</h3>
+                        <button class="btn btn-sm btn-outline" onclick="showAllTasks()">
+                            <i class="fas fa-plus"></i>
+                            New Task
+                        </button>
+                    </div>
+                    <div class="task-list" id="taskList">
+                        <div class="task-item">
+                            <div class="task-checkbox">
+                                <input type="checkbox" id="task1" onchange="toggleTask('task1')">
+                                <label for="task1"></label>
+                            </div>
+                            <div class="task-content">
+                                <h4>Finalize Project Plan</h4>
+                                <p class="text-muted">Due: Today, 5:00 PM</p>
+                            </div>
+                            <span class="badge badge-danger">High</span>
+                        </div>
+                        <div class="task-item">
+                            <div class="task-checkbox">
+                                <input type="checkbox" id="task2" onchange="toggleTask('task2')">
+                                <label for="task2"></label>
+                            </div>
+                            <div class="task-content">
+                                <h4>Review Documentation</h4>
+                                <p class="text-muted">Due: Tomorrow</p>
+                            </div>
+                            <span class="badge badge-warning">Medium</span>
+                        </div>
+                        <div class="task-item completed">
+                            <div class="task-checkbox">
+                                <input type="checkbox" id="task3" checked onchange="toggleTask('task3')">
+                                <label for="task3"></label>
+                            </div>
+                            <div class="task-content">
+                                <h4>Team Standup Meeting</h4>
+                                <p class="text-muted">Completed</p>
+                            </div>
+                            <span class="badge badge-success">Done</span>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- Notifications -->
+                <div class="card">
+                    <div class="card-header">
+                        <h3 class="card-title">Notification</h3>
+                        <div class="card-icon warning-icon">
+                            <i class="fas fa-bell"></i>
+                        </div>
+                    </div>
+                    <div class="notification-item">
+                        <div class="notification-content">
+                            <h4>Your shift starts in 30 mins</h4>
+                            <p class="text-muted">Don't forget to check in when you arrive</p>
+                        </div>
+                        <div class="notification-time">
+                            <small>5 mins ago</small>
+                        </div>
+                    </div>
+                    <div class="mt-15">
+                        <a href="#" class="btn btn-sm btn-outline" onclick="showAllNotifications()">
+                            View All
+                        </a>
+                    </div>
+                </div>
+
+                <!-- Cash-Ware or Company Stats -->
+                <div class="card">
+                    <div class="card-header">
+                        <h3 class="card-title">Cash-Ware</h3>
+                        <div class="card-icon success-icon">
+                            <i class="fas fa-chart-line"></i>
+                        </div>
+                    </div>
+                    <div class="stats-container">
+                        <div class="stat-item">
+                            <div class="stat-value">$12,450</div>
+                            <div class="stat-label">Monthly Earnings</div>
+                        </div>
+                        <div class="stat-item">
+                            <div class="stat-value">156h</div>
+                            <div class="stat-label">Hours Worked</div>
+                        </div>
+                    </div>
+                    <div class="mt-15">
+                        <button class="btn btn-sm btn-primary">
+                            <i class="fas fa-download"></i>
+                            Download Report
+                        </button>
+                    </div>
+                </div>
+            </div>
+        </main>
+    </div>
+
+    <!-- User Menu Dropdown -->
+    <div id="userMenuDropdown" class="dropdown-menu">
+        <a href="#" onclick="showProfile()">
+            <i class="fas fa-user"></i>
+            My Profile
+        </a>
+        <a href="#" onclick="showSettings()">
+            <i class="fas fa-cog"></i>
+            Settings
+        </a>
+        <hr>
+        <a href="#" class="logout-btn">
+            <i class="fas fa-sign-out-alt"></i>
+            Logout
+        </a>
+    </div>
+
+    <!-- Notification Panel -->
+    <div id="notificationPanel" class="notification-panel">
+        <div class="notification-header">
+            <h3>Notifications</h3>
+            <button onclick="toggleNotifications()">
+                <i class="fas fa-times"></i>
+            </button>
+        </div>
+        <div class="notification-list">
+            <div class="notification-item">
+                <div class="notification-icon info-icon">
+                    <i class="fas fa-info-circle"></i>
+                </div>
+                <div class="notification-content">
+                    <h4>Shift Reminder</h4>
+                    <p>Your shift starts in 30 minutes</p>
+                    <small>5 minutes ago</small>
+                </div>
+            </div>
+            <div class="notification-item">
+                <div class="notification-icon success-icon">
+                    <i class="fas fa-check-circle"></i>
+                </div>
+                <div class="notification-content">
+                    <h4>Task Completed</h4>
+                    <p>Team standup meeting marked as done</p>
+                    <small>1 hour ago</small>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- Scripts -->
+    <script src="https://unpkg.com/@supabase/supabase-js@2"></script>
+    <script src="js/supabase-config.js"></script>
+    <script src="js/auth.js"></script>
+    <script src="js/utils.js"></script>
+    <script src="js/attendance.js"></script>
+    
+    <script>
+        // Employee Dashboard Specific Functions
+        let isOnBreak = false;
+        let shiftStartTime = null;
+        let breakStartTime = null;
+        let totalBreakTime = 0;
+
+        // Initialize dashboard
+        document.addEventListener('DOMContentLoaded', async () => {
+            await checkAuth();
+            initializeDashboard();
+            updateCurrentTime();
+            generateCalendar();
+            loadTodayTasks();
+            loadNotifications();
+        });
+
+        function initializeDashboard() {
+            const userData = JSON.parse(localStorage.getItem('currentUser') || '{}');
+            document.getElementById('userName').textContent = userData.name?.split(' ')[0] || 'User';
+            
+            // Update user avatar and name in header
+            document.querySelector('.user-name').textContent = userData.name || 'User';
+            document.querySelector('.user-avatar').textContent = getInitials(userData.name || 'User');
+        }
+
+        function getInitials(name) {
+            return name.split(' ').map(word => word.charAt(0)).join('').toUpperCase().slice(0, 2);
+        }
+
+        // Update current time
+        function updateCurrentTime() {
+            setInterval(() => {
+                const now = new Date();
+                document.getElementById('currentTime').textContent = now.toLocaleTimeString();
+                
+                if (shiftStartTime) {
+                    updateShiftTimer();
+                }
+            }, 1000);
+        }
+
+        // Attendance functions
+        function toggleAttendance() {
+            const btn = document.getElementById('attendanceBtn');
+            const status = document.getElementById('shiftStatus');
+            
+            if (btn.innerHTML.includes('Check In')) {
+                // Check in
+                shiftStartTime = new Date();
+                btn.innerHTML = '<i class="fas fa-sign-out-alt"></i> Check Out';
+                btn.classList.remove('btn-primary');
+                btn.classList.add('btn-danger');
+                status.innerHTML = '<i class="fas fa-circle"></i> On Shift';
+                status.className = 'badge badge-success';
+                showNotification('Checked in successfully!', 'success');
+            } else {
+                // Check out
+                if (confirm('Are you sure you want to check out?')) {
+                    shiftStartTime = null;
+                    btn.innerHTML = '<i class="fas fa-sign-in-alt"></i> Check In';
+                    btn.classList.remove('btn-danger');
+                    btn.classList.add('btn-primary');
+                    status.innerHTML = '<i class="fas fa-circle"></i> Off Shift';
+                    status.className = 'badge badge-danger';
+                    showNotification('Checked out successfully!', 'success');
+                }
+            }
+        }
+
+        // Break management
+        function toggleBreak() {
+            const breakBtn = document.getElementById('breakBtn');
+            const resumeBtn = document.getElementById('resumeBtn');
+            
+            isOnBreak = true;
+            breakStartTime = new Date();
+            breakBtn.style.display = 'none';
+            resumeBtn.style.display = 'inline-flex';
+            showNotification('Break started', 'info');
+        }
+
+        function resumeWork() {
+            const breakBtn = document.getElementById('breakBtn');
+            const resumeBtn = document.getElementById('resumeBtn');
+            
+            if (breakStartTime) {
+                totalBreakTime += new Date() - breakStartTime;
+            }
+            
+            isOnBreak = false;
+            breakStartTime = null;
+            breakBtn.style.display = 'inline-flex';
+            resumeBtn.style.display = 'none';
+            showNotification('Break ended', 'success');
+        }
+
+        // Update shift timer
+        function updateShiftTimer() {
+            if (!shiftStartTime) return;
+            
+            const now = new Date();
+            let workTime = now - shiftStartTime - totalBreakTime;
+            
+            if (isOnBreak && breakStartTime) {
+                workTime -= (now - breakStartTime);
+            }
+            
+            const hours = Math.floor(workTime / (1000 * 60 * 60));
+            const minutes = Math.floor((workTime % (1000 * 60 * 60)) / (1000 * 60));
+            const seconds = Math.floor((workTime % (1000 * 60)) / 1000);
+            
+            document.getElementById('shiftTimer').textContent = 
+                `${hours.toString().padStart(2, '0')}:${minutes.toString().padStart(2, '0')}:${seconds.toString().padStart(2, '0')}`;
+        }
+
+        // Calendar functions
+        function generateCalendar() {
+            const now = new Date();
+            const year = now.getFullYear();
+            const month = now.getMonth();
+            
+            document.getElementById('currentMonth').textContent = 
+                new Date(year, month).toLocaleDateString('en-US', { month: 'long', year: 'numeric' });
+            
+            const firstDay = new Date(year, month, 1).getDay();
+            const daysInMonth = new Date(year, month + 1, 0).getDate();
+            
+            let calendarHTML = '';
+            
+            // Empty cells for days before month starts
+            for (let i = 0; i < firstDay; i++) {
+                calendarHTML += '<div class="calendar-day empty"></div>';
+            }
+            
+            // Days of the month
+            for (let day = 1; day <= daysInMonth; day++) {
+                const isToday = day === now.getDate();
+                const status = getAttendanceStatus(year, month, day);
+                
+                calendarHTML += `
+                    <div class="calendar-day ${isToday ? 'today' : ''} ${status}">
+                        ${day}
+                    </div>
+                `;
+            }
+            
+            document.getElementById('calendarBody').innerHTML = calendarHTML;
+        }
+
+        function getAttendanceStatus(year, month, day) {
+            // Mock data - replace with real attendance data
+            const attendance = {
+                '2024-5-1': 'present', '2024-5-2': 'present', '2024-5-3': 'absent',
+                '2024-5-6': 'present', '2024-5-7': 'present', '2024-5-8': 'present',
+                '2024-5-9': 'half-day', '2024-5-10': 'present'
+            };
+            
+            const dateKey = `${year}-${month}-${day}`;
+            return attendance[dateKey] || '';
+        }
+
+        // Task management
+        function toggleTask(taskId) {
+            const taskItem = document.querySelector(`#${taskId}`).closest('.task-item');
+            const checkbox = document.getElementById(taskId);
+            
+            if (checkbox.checked) {
+                taskItem.classList.add('completed');
+                showNotification('Task marked as completed!', 'success');
+            } else {
+                taskItem.classList.remove('completed');
+                showNotification('Task marked as pending', 'info');
+            }
+        }
+
+        function loadTodayTasks() {
+            // This would normally load from database
+            console.log('Loading today\'s tasks...');
+        }
+
+        function showAllTasks() {
+            window.location.href = '#tasks';
+        }
+
+        // Navigation functions
+        function showTasks() {
+            showNotification('Tasks feature coming soon!', 'info');
+        }
+
+        function showProfile() {
+            showNotification('Profile feature coming soon!', 'info');
+        }
+
+        function showSettings() {
+            showNotification('Settings feature coming soon!', 'info');
+        }
+
+        // Notification management
+        function toggleNotifications() {
+            const panel = document.getElementById('notificationPanel');
+            panel.classList.toggle('active');
+        }
+
+        function toggleUserMenu() {
+            const dropdown = document.getElementById('userMenuDropdown');
+            dropdown.classList.toggle('active');
+        }
+
+        function loadNotifications() {
+            // Load notifications from database or localStorage
+            console.log('Loading notifications...');
+        }
+
+        function showAllNotifications() {
+            toggleNotifications();
+        }
+
+        // Calendar navigation
+        function previousMonth() {
+            showNotification('Previous month feature coming soon!', 'info');
+        }
+
+        function nextMonth() {
+            showNotification('Next month feature coming soon!', 'info');
+        }
+
+        // Close dropdowns when clicking outside
+        document.addEventListener('click', (e) => {
+            if (!e.target.closest('.user-menu')) {
+                document.getElementById('userMenuDropdown').classList.remove('active');
+            }
+            if (!e.target.closest('.notification-btn') && !e.target.closest('.notification-panel')) {
+                document.getElementById('notificationPanel').classList.remove('active');
+            }
+        });
+    </script>
+</body>
+</html>
