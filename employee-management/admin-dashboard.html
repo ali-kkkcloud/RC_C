@@ -1,0 +1,817 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Admin Portal - Dashboard</title>
+    <link rel="stylesheet" href="css/style.css">
+    <link rel="stylesheet" href="css/mobile.css">
+    <link href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0/css/all.min.css" rel="stylesheet">
+</head>
+<body class="dashboard">
+    <!-- Header -->
+    <header class="header">
+        <div class="header-left">
+            <h1 class="header-title">ADMIN PORTAL</h1>
+        </div>
+        <div class="header-right">
+            <button class="notification-btn" onclick="toggleNotifications()">
+                <i class="fas fa-bell"></i>
+                <span class="notification-badge" id="notificationBadge">3</span>
+            </button>
+            <div class="user-menu" onclick="toggleUserMenu()">
+                <div class="user-avatar">AD</div>
+                <span class="user-name">Admin User</span>
+                <i class="fas fa-chevron-down"></i>
+            </div>
+        </div>
+    </header>
+
+    <!-- Main Layout -->
+    <div class="main-layout">
+        <!-- Sidebar -->
+        <aside class="sidebar">
+            <nav class="nav-menu">
+                <div class="nav-item">
+                    <a href="admin-dashboard.html" class="nav-link active">
+                        <i class="fas fa-tachometer-alt"></i>
+                        <span>Dashboard</span>
+                    </a>
+                </div>
+                <div class="nav-item">
+                    <a href="#" class="nav-link" onclick="showEmployeeManagement()">
+                        <i class="fas fa-users"></i>
+                        <span>Employees</span>
+                    </a>
+                </div>
+                <div class="nav-item">
+                    <a href="attendance.html" class="nav-link">
+                        <i class="fas fa-clock"></i>
+                        <span>Attendance</span>
+                    </a>
+                </div>
+                <div class="nav-item">
+                    <a href="#" class="nav-link" onclick="showTaskManagement()">
+                        <i class="fas fa-tasks"></i>
+                        <span>Tasks</span>
+                    </a>
+                </div>
+                <div class="nav-item">
+                    <a href="training.html" class="nav-link">
+                        <i class="fas fa-graduation-cap"></i>
+                        <span>Training</span>
+                    </a>
+                </div>
+                <div class="nav-item">
+                    <a href="#" class="nav-link" onclick="showReports()">
+                        <i class="fas fa-chart-bar"></i>
+                        <span>Reports</span>
+                    </a>
+                </div>
+                <div class="nav-item">
+                    <a href="settings.html" class="nav-link">
+                        <i class="fas fa-cog"></i>
+                        <span>Settings</span>
+                    </a>
+                </div>
+                <div class="nav-item">
+                    <a href="#" class="nav-link logout-btn">
+                        <i class="fas fa-sign-out-alt"></i>
+                        <span>Logout</span>
+                    </a>
+                </div>
+            </nav>
+        </aside>
+
+        <!-- Main Content -->
+        <main class="main-content">
+            <!-- Page Header -->
+            <div class="page-header">
+                <h1 class="page-title">Admin Dashboard</h1>
+                <p class="page-subtitle">System overview and management</p>
+            </div>
+
+            <!-- Quick Actions -->
+            <div class="quick-actions mb-30">
+                <button class="btn btn-primary" onclick="showAddEmployeeModal()">
+                    <i class="fas fa-user-plus"></i>
+                    Add Employee
+                </button>
+                <button class="btn btn-success" onclick="showCreateTaskModal()">
+                    <i class="fas fa-plus"></i>
+                    Create Task
+                </button>
+                <button class="btn btn-info" onclick="generateReport()">
+                    <i class="fas fa-file-export"></i>
+                    Generate Report
+                </button>
+                <button class="btn btn-warning" onclick="showBulkActions()">
+                    <i class="fas fa-cogs"></i>
+                    Bulk Actions
+                </button>
+            </div>
+
+            <!-- Stats Overview -->
+            <div class="dashboard-grid">
+                <!-- Total Employees -->
+                <div class="card">
+                    <div class="card-header">
+                        <h3 class="card-title">Total Employees</h3>
+                        <div class="card-icon primary-icon">
+                            <i class="fas fa-users"></i>
+                        </div>
+                    </div>
+                    <div class="stats-value" id="totalEmployees">45</div>
+                    <div class="stats-change positive">
+                        <i class="fas fa-arrow-up"></i>
+                        +3 this month
+                    </div>
+                </div>
+
+                <!-- Present Today -->
+                <div class="card">
+                    <div class="card-header">
+                        <h3 class="card-title">Present Today</h3>
+                        <div class="card-icon success-icon">
+                            <i class="fas fa-user-check"></i>
+                        </div>
+                    </div>
+                    <div class="stats-value" id="presentToday">38</div>
+                    <div class="stats-label">84% attendance rate</div>
+                </div>
+
+                <!-- Pending Tasks -->
+                <div class="card">
+                    <div class="card-header">
+                        <h3 class="card-title">Pending Tasks</h3>
+                        <div class="card-icon warning-icon">
+                            <i class="fas fa-exclamation-triangle"></i>
+                        </div>
+                    </div>
+                    <div class="stats-value" id="pendingTasks">12</div>
+                    <div class="stats-change negative">
+                        <i class="fas fa-arrow-down"></i>
+                        -5 from yesterday
+                    </div>
+                </div>
+
+                <!-- Training Progress -->
+                <div class="card">
+                    <div class="card-header">
+                        <h3 class="card-title">Training Progress</h3>
+                        <div class="card-icon info-icon">
+                            <i class="fas fa-graduation-cap"></i>
+                        </div>
+                    </div>
+                    <div class="stats-value">78%</div>
+                    <div class="stats-label">Average completion</div>
+                </div>
+
+                <!-- Recent Activity -->
+                <div class="card">
+                    <div class="card-header">
+                        <h3 class="card-title">Recent Activity</h3>
+                        <button class="btn btn-sm btn-outline" onclick="showAllActivity()">
+                            View All
+                        </button>
+                    </div>
+                    <div class="activity-list">
+                        <div class="activity-item">
+                            <div class="activity-icon success-icon">
+                                <i class="fas fa-user-plus"></i>
+                            </div>
+                            <div class="activity-content">
+                                <p><strong>John Doe</strong> checked in</p>
+                                <small>2 minutes ago</small>
+                            </div>
+                        </div>
+                        <div class="activity-item">
+                            <div class="activity-icon info-icon">
+                                <i class="fas fa-tasks"></i>
+                            </div>
+                            <div class="activity-content">
+                                <p><strong>Task</strong> assigned to Sarah Wilson</p>
+                                <small>15 minutes ago</small>
+                            </div>
+                        </div>
+                        <div class="activity-item">
+                            <div class="activity-icon warning-icon">
+                                <i class="fas fa-clock"></i>
+                            </div>
+                            <div class="activity-content">
+                                <p><strong>Mike Johnson</strong> marked absent</p>
+                                <small>1 hour ago</small>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- Employee Status Chart -->
+                <div class="card">
+                    <div class="card-header">
+                        <h3 class="card-title">Employee Status</h3>
+                    </div>
+                    <div class="chart-container">
+                        <canvas id="statusChart" width="300" height="200"></canvas>
+                    </div>
+                </div>
+
+                <!-- Attendance Overview -->
+                <div class="card">
+                    <div class="card-header">
+                        <h3 class="card-title">Attendance Overview</h3>
+                        <select class="form-control" style="width: auto;" onchange="updateAttendanceChart(this.value)">
+                            <option value="week">This Week</option>
+                            <option value="month">This Month</option>
+                            <option value="year">This Year</option>
+                        </select>
+                    </div>
+                    <div class="chart-container">
+                        <canvas id="attendanceChart" width="400" height="200"></canvas>
+                    </div>
+                </div>
+
+                <!-- Top Performers -->
+                <div class="card">
+                    <div class="card-header">
+                        <h3 class="card-title">Top Performers</h3>
+                        <button class="btn btn-sm btn-outline" onclick="showAllPerformers()">
+                            View All
+                        </button>
+                    </div>
+                    <div class="performer-list">
+                        <div class="performer-item">
+                            <div class="performer-avatar">
+                                <img src="assets/default-avatar.png" alt="Employee" onerror="this.style.display='none'; this.nextElementSibling.style.display='flex'">
+                                <div class="avatar-text">SA</div>
+                            </div>
+                            <div class="performer-info">
+                                <h4>Sarah Anderson</h4>
+                                <p>Completed 15 tasks</p>
+                            </div>
+                            <div class="performer-score">
+                                <span class="badge badge-success">98%</span>
+                            </div>
+                        </div>
+                        <div class="performer-item">
+                            <div class="performer-avatar">
+                                <div class="avatar-text">JD</div>
+                            </div>
+                            <div class="performer-info">
+                                <h4>John Doe</h4>
+                                <p>Completed 12 tasks</p>
+                            </div>
+                            <div class="performer-score">
+                                <span class="badge badge-success">95%</span>
+                            </div>
+                        </div>
+                        <div class="performer-item">
+                            <div class="performer-avatar">
+                                <div class="avatar-text">MW</div>
+                            </div>
+                            <div class="performer-info">
+                                <h4>Mike Wilson</h4>
+                                <p>Completed 10 tasks</p>
+                            </div>
+                            <div class="performer-score">
+                                <span class="badge badge-info">92%</span>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- Quick Stats -->
+                <div class="card">
+                    <div class="card-header">
+                        <h3 class="card-title">Quick Stats</h3>
+                    </div>
+                    <div class="quick-stats">
+                        <div class="stat-row">
+                            <span class="stat-label">Active Projects</span>
+                            <span class="stat-value">8</span>
+                        </div>
+                        <div class="stat-row">
+                            <span class="stat-label">Departments</span>
+                            <span class="stat-value">5</span>
+                        </div>
+                        <div class="stat-row">
+                            <span class="stat-label">Average Hours/Day</span>
+                            <span class="stat-value">7.5h</span>
+                        </div>
+                        <div class="stat-row">
+                            <span class="stat-label">Overtime Hours</span>
+                            <span class="stat-value">15h</span>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- Pending Approvals -->
+                <div class="card">
+                    <div class="card-header">
+                        <h3 class="card-title">Pending Approvals</h3>
+                        <span class="badge badge-warning">5</span>
+                    </div>
+                    <div class="approval-list">
+                        <div class="approval-item">
+                            <div class="approval-content">
+                                <h4>Leave Request</h4>
+                                <p>John Doe - 2 days sick leave</p>
+                                <small>Submitted 2 hours ago</small>
+                            </div>
+                            <div class="approval-actions">
+                                <button class="btn btn-sm btn-success" onclick="approveRequest('leave_1')">
+                                    <i class="fas fa-check"></i>
+                                </button>
+                                <button class="btn btn-sm btn-danger" onclick="rejectRequest('leave_1')">
+                                    <i class="fas fa-times"></i>
+                                </button>
+                            </div>
+                        </div>
+                        <div class="approval-item">
+                            <div class="approval-content">
+                                <h4>Overtime Request</h4>
+                                <p>Sarah Wilson - 3 hours overtime</p>
+                                <small>Submitted 1 day ago</small>
+                            </div>
+                            <div class="approval-actions">
+                                <button class="btn btn-sm btn-success" onclick="approveRequest('overtime_1')">
+                                    <i class="fas fa-check"></i>
+                                </button>
+                                <button class="btn btn-sm btn-danger" onclick="rejectRequest('overtime_1')">
+                                    <i class="fas fa-times"></i>
+                                </button>
+                            </div>
+                        </div>
+                    </div>
+                    <div class="mt-15">
+                        <button class="btn btn-sm btn-outline" onclick="showAllApprovals()">
+                            View All Approvals
+                        </button>
+                    </div>
+                </div>
+
+                <!-- System Health -->
+                <div class="card">
+                    <div class="card-header">
+                        <h3 class="card-title">System Health</h3>
+                        <span class="badge badge-success">Online</span>
+                    </div>
+                    <div class="health-metrics">
+                        <div class="metric-item">
+                            <div class="metric-label">Database</div>
+                            <div class="metric-status success">
+                                <i class="fas fa-circle"></i>
+                                Operational
+                            </div>
+                        </div>
+                        <div class="metric-item">
+                            <div class="metric-label">API Response</div>
+                            <div class="metric-status success">
+                                <i class="fas fa-circle"></i>
+                                145ms
+                            </div>
+                        </div>
+                        <div class="metric-item">
+                            <div class="metric-label">Storage</div>
+                            <div class="metric-status warning">
+                                <i class="fas fa-circle"></i>
+                                78% Used
+                            </div>
+                        </div>
+                        <div class="metric-item">
+                            <div class="metric-label">Last Backup</div>
+                            <div class="metric-status success">
+                                <i class="fas fa-circle"></i>
+                                2 hours ago
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+
+            <!-- Employee Table -->
+            <div class="card mt-30">
+                <div class="card-header">
+                    <h3 class="card-title">Employee Management</h3>
+                    <div class="card-actions">
+                        <input type="search" placeholder="Search employees..." class="form-control" style="width: 250px;" onkeyup="filterEmployees(this.value)">
+                        <button class="btn btn-primary" onclick="showAddEmployeeModal()">
+                            <i class="fas fa-plus"></i>
+                            Add Employee
+                        </button>
+                    </div>
+                </div>
+                <div class="table-container">
+                    <table class="table" id="employeesTable">
+                        <thead>
+                            <tr>
+                                <th>Employee</th>
+                                <th>Department</th>
+                                <th>Status</th>
+                                <th>Last Active</th>
+                                <th>Performance</th>
+                                <th>Actions</th>
+                            </tr>
+                        </thead>
+                        <tbody id="employeesTableBody">
+                            <tr>
+                                <td>
+                                    <div class="employee-info">
+                                        <div class="employee-avatar">JD</div>
+                                        <div>
+                                            <strong>John Doe</strong>
+                                            <br><small>john@company.com</small>
+                                        </div>
+                                    </div>
+                                </td>
+                                <td>IT Department</td>
+                                <td><span class="badge badge-success">Active</span></td>
+                                <td>2 mins ago</td>
+                                <td>
+                                    <div class="progress-bar-small">
+                                        <div class="progress-fill" style="width: 85%"></div>
+                                    </div>
+                                    <small>85%</small>
+                                </td>
+                                <td>
+                                    <button class="btn btn-sm btn-outline" onclick="editEmployee('emp_001')">
+                                        <i class="fas fa-edit"></i>
+                                    </button>
+                                    <button class="btn btn-sm btn-danger" onclick="deleteEmployee('emp_001')">
+                                        <i class="fas fa-trash"></i>
+                                    </button>
+                                </td>
+                            </tr>
+                            <tr>
+                                <td>
+                                    <div class="employee-info">
+                                        <div class="employee-avatar">SW</div>
+                                        <div>
+                                            <strong>Sarah Wilson</strong>
+                                            <br><small>sarah@company.com</small>
+                                        </div>
+                                    </div>
+                                </td>
+                                <td>Marketing</td>
+                                <td><span class="badge badge-success">Active</span></td>
+                                <td>5 mins ago</td>
+                                <td>
+                                    <div class="progress-bar-small">
+                                        <div class="progress-fill" style="width: 92%"></div>
+                                    </div>
+                                    <small>92%</small>
+                                </td>
+                                <td>
+                                    <button class="btn btn-sm btn-outline" onclick="editEmployee('emp_002')">
+                                        <i class="fas fa-edit"></i>
+                                    </button>
+                                    <button class="btn btn-sm btn-danger" onclick="deleteEmployee('emp_002')">
+                                        <i class="fas fa-trash"></i>
+                                    </button>
+                                </td>
+                            </tr>
+                        </tbody>
+                    </table>
+                </div>
+            </div>
+        </main>
+    </div>
+
+    <!-- User Menu Dropdown -->
+    <div id="userMenuDropdown" class="dropdown-menu">
+        <a href="#" onclick="showProfile()">
+            <i class="fas fa-user"></i>
+            My Profile
+        </a>
+        <a href="settings.html">
+            <i class="fas fa-cog"></i>
+            Settings
+        </a>
+        <hr>
+        <a href="#" class="logout-btn">
+            <i class="fas fa-sign-out-alt"></i>
+            Logout
+        </a>
+    </div>
+
+    <!-- Notification Panel -->
+    <div id="notificationPanel" class="notification-panel">
+        <div class="notification-header">
+            <h3>System Notifications</h3>
+            <button onclick="toggleNotifications()">
+                <i class="fas fa-times"></i>
+            </button>
+        </div>
+        <div class="notification-list">
+            <div class="notification-item">
+                <div class="notification-icon warning-icon">
+                    <i class="fas fa-exclamation-triangle"></i>
+                </div>
+                <div class="notification-content">
+                    <h4>5 Leave Requests Pending</h4>
+                    <p>Approval required for employee leave requests</p>
+                    <small>10 minutes ago</small>
+                </div>
+            </div>
+            <div class="notification-item">
+                <div class="notification-icon success-icon">
+                    <i class="fas fa-check-circle"></i>
+                </div>
+                <div class="notification-content">
+                    <h4>Monthly Report Generated</h4>
+                    <p>Attendance report for March 2024 is ready</p>
+                    <small>1 hour ago</small>
+                </div>
+            </div>
+            <div class="notification-item">
+                <div class="notification-icon info-icon">
+                    <i class="fas fa-info-circle"></i>
+                </div>
+                <div class="notification-content">
+                    <h4>System Backup Completed</h4>
+                    <p>Daily backup completed successfully</p>
+                    <small>2 hours ago</small>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- Add Employee Modal -->
+    <div id="addEmployeeModal" class="modal-overlay">
+        <div class="modal-content">
+            <div class="modal-header">
+                <h3>Add New Employee</h3>
+                <button class="modal-close" onclick="closeModal('addEmployeeModal')">
+                    <i class="fas fa-times"></i>
+                </button>
+            </div>
+            <div class="modal-body">
+                <form id="addEmployeeForm">
+                    <div class="form-row">
+                        <div class="form-group">
+                            <label for="employeeName">Full Name</label>
+                            <input type="text" id="employeeName" class="form-control" required>
+                        </div>
+                        <div class="form-group">
+                            <label for="employeeEmail">Email Address</label>
+                            <input type="email" id="employeeEmail" class="form-control" required>
+                        </div>
+                    </div>
+                    <div class="form-row">
+                        <div class="form-group">
+                            <label for="employeeDepartment">Department</label>
+                            <select id="employeeDepartment" class="form-control" required>
+                                <option value="">Select Department</option>
+                                <option value="IT">IT Department</option>
+                                <option value="HR">Human Resources</option>
+                                <option value="Finance">Finance</option>
+                                <option value="Marketing">Marketing</option>
+                                <option value="Operations">Operations</option>
+                            </select>
+                        </div>
+                        <div class="form-group">
+                            <label for="employeeRole">Role</label>
+                            <select id="employeeRole" class="form-control" required>
+                                <option value="employee">Employee</option>
+                                <option value="admin">Admin</option>
+                                <option value="manager">Manager</option>
+                            </select>
+                        </div>
+                    </div>
+                    <div class="form-row">
+                        <div class="form-group">
+                            <label for="employeePhone">Phone Number</label>
+                            <input type="tel" id="employeePhone" class="form-control">
+                        </div>
+                        <div class="form-group">
+                            <label for="employeeHireDate">Hire Date</label>
+                            <input type="date" id="employeeHireDate" class="form-control" required>
+                        </div>
+                    </div>
+                    <div class="form-group">
+                        <label for="employeePassword">Temporary Password</label>
+                        <input type="password" id="employeePassword" class="form-control" required>
+                        <small class="text-muted">Employee will need to change this on first login</small>
+                    </div>
+                </form>
+            </div>
+            <div class="modal-footer">
+                <button class="btn btn-outline" onclick="closeModal('addEmployeeModal')">Cancel</button>
+                <button class="btn btn-primary" onclick="saveEmployee()">Add Employee</button>
+            </div>
+        </div>
+    </div>
+
+    <!-- Scripts -->
+    <script src="https://unpkg.com/@supabase/supabase-js@2"></script>
+    <script src="js/supabase-config.js"></script>
+    <script src="js/auth.js"></script>
+    <script src="js/utils.js"></script>
+    <script src="js/admin-functions.js"></script>
+    
+    <script>
+        // Admin Dashboard Specific Functions
+        document.addEventListener('DOMContentLoaded', async () => {
+            await checkAuth();
+            if (!authManager.isAdmin()) {
+                showNotification('Access denied. Admin privileges required.', 'error');
+                setTimeout(() => {
+                    window.location.href = 'employee-dashboard.html';
+                }, 2000);
+                return;
+            }
+            
+            initializeAdminDashboard();
+            loadDashboardData();
+        });
+
+        function initializeAdminDashboard() {
+            const userData = JSON.parse(localStorage.getItem('currentUser') || '{}');
+            document.querySelector('.user-name').textContent = userData.name || 'Admin';
+            document.querySelector('.user-avatar').textContent = StringUtils.getInitials(userData.name || 'Admin');
+        }
+
+        async function loadDashboardData() {
+            UIUtils.showLoading('Loading dashboard data...');
+            
+            try {
+                await Promise.all([
+                    loadEmployeeStats(),
+                    loadAttendanceStats(),
+                    loadTaskStats(),
+                    loadRecentActivity(),
+                    loadEmployeeList()
+                ]);
+                
+                UIUtils.hideLoading();
+            } catch (error) {
+                console.error('Error loading dashboard data:', error);
+                UIUtils.hideLoading();
+                showNotification('Error loading dashboard data', 'error');
+            }
+        }
+
+        async function loadEmployeeStats() {
+            // Mock data - replace with real API calls
+            document.getElementById('totalEmployees').textContent = '45';
+            document.getElementById('presentToday').textContent = '38';
+        }
+
+        async function loadAttendanceStats() {
+            // Mock data
+            console.log('Loading attendance stats...');
+        }
+
+        async function loadTaskStats() {
+            document.getElementById('pendingTasks').textContent = '12';
+        }
+
+        async function loadRecentActivity() {
+            console.log('Loading recent activity...');
+        }
+
+        async function loadEmployeeList() {
+            console.log('Loading employee list...');
+        }
+
+        // Navigation functions
+        function showEmployeeManagement() {
+            showNotification('Employee management feature coming soon!', 'info');
+        }
+
+        function showTaskManagement() {
+            showNotification('Task management feature coming soon!', 'info');
+        }
+
+        function showReports() {
+            showNotification('Reports feature coming soon!', 'info');
+        }
+
+        // Modal functions
+        function showAddEmployeeModal() {
+            document.getElementById('addEmployeeModal').style.display = 'flex';
+        }
+
+        function closeModal(modalId) {
+            document.getElementById(modalId).style.display = 'none';
+        }
+
+        function saveEmployee() {
+            const form = document.getElementById('addEmployeeForm');
+            const formData = new FormData(form);
+            
+            // Validate form
+            if (!form.checkValidity()) {
+                showNotification('Please fill in all required fields', 'error');
+                return;
+            }
+            
+            // Mock save - replace with real API call
+            showNotification('Employee added successfully!', 'success');
+            closeModal('addEmployeeModal');
+            form.reset();
+        }
+
+        // Employee actions
+        function editEmployee(employeeId) {
+            showNotification(`Edit employee ${employeeId} - Feature coming soon!`, 'info');
+        }
+
+        function deleteEmployee(employeeId) {
+            if (confirm('Are you sure you want to delete this employee?')) {
+                showNotification(`Employee ${employeeId} deleted successfully!`, 'success');
+            }
+        }
+
+        // Filter functions
+        function filterEmployees(searchTerm) {
+            const table = document.getElementById('employeesTableBody');
+            const rows = table.querySelectorAll('tr');
+            
+            rows.forEach(row => {
+                const text = row.textContent.toLowerCase();
+                row.style.display = text.includes(searchTerm.toLowerCase()) ? '' : 'none';
+            });
+        }
+
+        // Quick action functions
+        function showCreateTaskModal() {
+            showNotification('Create task feature coming soon!', 'info');
+        }
+
+        function generateReport() {
+            UIUtils.showLoading('Generating report...');
+            setTimeout(() => {
+                UIUtils.hideLoading();
+                showNotification('Report generated successfully!', 'success');
+            }, 2000);
+        }
+
+        function showBulkActions() {
+            showNotification('Bulk actions feature coming soon!', 'info');
+        }
+
+        // Approval functions
+        function approveRequest(requestId) {
+            showNotification(`Request ${requestId} approved!`, 'success');
+        }
+
+        function rejectRequest(requestId) {
+            if (confirm('Are you sure you want to reject this request?')) {
+                showNotification(`Request ${requestId} rejected!`, 'warning');
+            }
+        }
+
+        // View all functions
+        function showAllActivity() {
+            showNotification('Activity log feature coming soon!', 'info');
+        }
+
+        function showAllPerformers() {
+            showNotification('Performance analytics coming soon!', 'info');
+        }
+
+        function showAllApprovals() {
+            showNotification('Approval management coming soon!', 'info');
+        }
+
+        // Chart functions
+        function updateAttendanceChart(period) {
+            console.log('Updating attendance chart for:', period);
+            showNotification(`Chart updated for ${period}`, 'info');
+        }
+
+        // Notification functions
+        function toggleNotifications() {
+            const panel = document.getElementById('notificationPanel');
+            panel.classList.toggle('active');
+        }
+
+        function toggleUserMenu() {
+            const dropdown = document.getElementById('userMenuDropdown');
+            dropdown.classList.toggle('active');
+        }
+
+        function showProfile() {
+            showNotification('Profile feature coming soon!', 'info');
+        }
+
+        // Close dropdowns when clicking outside
+        document.addEventListener('click', (e) => {
+            if (!e.target.closest('.user-menu')) {
+                document.getElementById('userMenuDropdown').classList.remove('active');
+            }
+            if (!e.target.closest('.notification-btn') && !e.target.closest('.notification-panel')) {
+                document.getElementById('notificationPanel').classList.remove('active');
+            }
+        });
+
+        // Close modals when clicking outside
+        document.addEventListener('click', (e) => {
+            if (e.target.classList.contains('modal-overlay')) {
+                e.target.style.display = 'none';
+            }
+        });
+    </script>
+</body>
+</html>
