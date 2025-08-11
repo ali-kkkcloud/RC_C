@@ -1,0 +1,456 @@
+/* File Name: css/mobile.css */
+
+/* Mobile Responsive Styles */
+
+/* Tablet Styles */
+@media (max-width: 1024px) {
+    .main-layout {
+        flex-direction: column;
+    }
+    
+    .sidebar {
+        width: 100%;
+        height: auto;
+        position: static;
+        order: 2;
+        border-right: none;
+        border-top: 1px solid var(--gray-200);
+        padding: 20px 0;
+    }
+    
+    .nav-menu {
+        display: flex;
+        overflow-x: auto;
+        padding: 0 20px;
+        gap: 10px;
+    }
+    
+    .nav-item {
+        margin-bottom: 0;
+        min-width: 120px;
+    }
+    
+    .nav-link {
+        padding: 10px 15px;
+        border-radius: 8px;
+        white-space: nowrap;
+        text-align: center;
+        flex-direction: column;
+        gap: 5px;
+    }
+    
+    .main-content {
+        order: 1;
+        padding: 20px;
+    }
+    
+    .dashboard-grid {
+        grid-template-columns: repeat(auto-fit, minmax(250px, 1fr));
+        gap: 20px;
+    }
+}
+
+/* Mobile Styles */
+@media (max-width: 768px) {
+    /* Header */
+    .header {
+        padding: 0 15px;
+        height: 60px;
+    }
+    
+    .header-title {
+        font-size: 18px;
+    }
+    
+    .user-name {
+        display: none;
+    }
+    
+    .notification-btn {
+        font-size: 16px;
+    }
+    
+    /* Login Page */
+    .login-page {
+        padding: 15px;
+    }
+    
+    .login-box {
+        padding: 30px 25px;
+    }
+    
+    .logo h1 {
+        font-size: 20px;
+    }
+    
+    .demo-buttons {
+        flex-direction: column;
+        gap: 8px;
+    }
+    
+    /* Main Content */
+    .main-content {
+        padding: 15px;
+    }
+    
+    .page-title {
+        font-size: 24px;
+    }
+    
+    .page-subtitle {
+        font-size: 14px;
+    }
+    
+    /* Dashboard Grid */
+    .dashboard-grid {
+        grid-template-columns: 1fr;
+        gap: 15px;
+    }
+    
+    /* Cards */
+    .card {
+        padding: 20px;
+    }
+    
+    .card-header {
+        flex-direction: column;
+        align-items: flex-start;
+        gap: 10px;
+    }
+    
+    .stats-value {
+        font-size: 28px;
+    }
+    
+    /* Sidebar Navigation */
+    .nav-menu {
+        padding: 0 15px;
+        gap: 5px;
+    }
+    
+    .nav-item {
+        min-width: 100px;
+    }
+    
+    .nav-link {
+        padding: 8px 12px;
+        font-size: 12px;
+    }
+    
+    .nav-link i {
+        font-size: 14px;
+    }
+    
+    /* Forms */
+    .form-container {
+        padding: 20px;
+    }
+    
+    .form-row {
+        grid-template-columns: 1fr;
+        gap: 15px;
+    }
+    
+    /* Tables */
+    .table-container {
+        overflow-x: auto;
+    }
+    
+    .table {
+        min-width: 600px;
+    }
+    
+    .table th,
+    .table td {
+        padding: 10px 8px;
+        font-size: 13px;
+    }
+    
+    /* Buttons */
+    .btn {
+        padding: 12px 20px;
+        font-size: 14px;
+    }
+    
+    .btn-sm {
+        padding: 8px 12px;
+        font-size: 12px;
+    }
+    
+    /* Notifications */
+    .notification {
+        left: 15px;
+        right: 15px;
+        max-width: none;
+        margin: 0;
+    }
+    
+    /* Utility Classes for Mobile */
+    .mobile-hide {
+        display: none !important;
+    }
+    
+    .mobile-show {
+        display: block !important;
+    }
+    
+    .mobile-flex {
+        display: flex !important;
+    }
+}
+
+/* Small Mobile Styles */
+@media (max-width: 480px) {
+    /* Header */
+    .header {
+        padding: 0 10px;
+        height: 55px;
+    }
+    
+    .header-title {
+        font-size: 16px;
+    }
+    
+    .header-right {
+        gap: 10px;
+    }
+    
+    /* Login */
+    .login-box {
+        padding: 25px 20px;
+    }
+    
+    .logo i {
+        font-size: 28px;
+    }
+    
+    .logo h1 {
+        font-size: 18px;
+    }
+    
+    .login-btn {
+        padding: 12px 20px;
+        font-size: 14px;
+    }
+    
+    /* Main Content */
+    .main-content {
+        padding: 10px;
+    }
+    
+    .page-title {
+        font-size: 20px;
+    }
+    
+    /* Cards */
+    .card {
+        padding: 15px;
+    }
+    
+    .stats-value {
+        font-size: 24px;
+    }
+    
+    .card-title {
+        font-size: 16px;
+    }
+    
+    /* Navigation */
+    .nav-link {
+        padding: 6px 8px;
+        font-size: 11px;
+        min-width: 80px;
+    }
+    
+    /* Forms */
+    .form-container {
+        padding: 15px;
+    }
+    
+    .form-control {
+        padding: 10px 12px;
+        font-size: 14px;
+    }
+    
+    /* Tables */
+    .table th,
+    .table td {
+        padding: 8px 6px;
+        font-size: 12px;
+    }
+    
+    /* Buttons */
+    .btn {
+        padding: 10px 16px;
+        font-size: 13px;
+    }
+}
+
+/* Landscape Mobile */
+@media (max-width: 768px) and (orientation: landscape) {
+    .login-page {
+        padding: 10px;
+    }
+    
+    .login-box {
+        padding: 20px;
+        max-width: 400px;
+    }
+    
+    .main-content {
+        padding: 15px;
+    }
+    
+    .dashboard-grid {
+        grid-template-columns: repeat(2, 1fr);
+        gap: 15px;
+    }
+}
+
+/* Touch Device Optimizations */
+@media (hover: none) and (pointer: coarse) {
+    /* Increase touch targets */
+    .btn {
+        min-height: 44px;
+        padding: 12px 20px;
+    }
+    
+    .nav-link {
+        min-height: 44px;
+        padding: 12px 15px;
+    }
+    
+    .form-control {
+        min-height: 44px;
+        padding: 12px 16px;
+        font-size: 16px; /* Prevents zoom on iOS */
+    }
+    
+    /* Remove hover states */
+    .btn:hover,
+    .nav-link:hover,
+    .card:hover {
+        transform: none;
+        box-shadow: var(--shadow);
+    }
+    
+    /* Focus states for accessibility */
+    .btn:focus,
+    .nav-link:focus,
+    .form-control:focus {
+        outline: 2px solid var(--primary-color);
+        outline-offset: 2px;
+    }
+}
+
+/* High DPI Displays */
+@media (-webkit-min-device-pixel-ratio: 2), (min-resolution: 192dpi) {
+    .logo i,
+    .card-icon {
+        -webkit-font-smoothing: antialiased;
+        -moz-osx-font-smoothing: grayscale;
+    }
+}
+
+/* Dark Mode Support */
+@media (prefers-color-scheme: dark) {
+    :root {
+        --light-color: #1F2937;
+        --white: #374151;
+        --gray-100: #374151;
+        --gray-200: #4B5563;
+        --gray-800: #F9FAFB;
+        --gray-900: #FFFFFF;
+    }
+    
+    .login-page {
+        background: linear-gradient(135deg, var(--gray-800) 0%, var(--gray-900) 100%);
+    }
+}
+
+/* Reduced Motion */
+@media (prefers-reduced-motion: reduce) {
+    *,
+    *::before,
+    *::after {
+        animation-duration: 0.01ms !important;
+        animation-iteration-count: 1 !important;
+        transition-duration: 0.01ms !important;
+    }
+    
+    .spinner {
+        animation: none;
+        border: 4px solid var(--gray-200);
+        border-top-color: var(--primary-color);
+    }
+}
+
+/* Print Styles */
+@media print {
+    .header,
+    .sidebar,
+    .btn,
+    .notification {
+        display: none !important;
+    }
+    
+    .main-content {
+        padding: 0 !important;
+        margin: 0 !important;
+    }
+    
+    .card {
+        box-shadow: none !important;
+        border: 1px solid var(--gray-300) !important;
+        break-inside: avoid;
+    }
+    
+    .table {
+        border-collapse: collapse !important;
+    }
+    
+    .table th,
+    .table td {
+        border: 1px solid var(--gray-300) !important;
+    }
+}
+
+/* Accessibility Improvements */
+@media (prefers-contrast: high) {
+    :root {
+        --primary-color: #000080;
+        --danger-color: #CC0000;
+        --secondary-color: #006600;
+        --gray-400: #666666;
+    }
+}
+
+/* Mobile Menu Toggle (for future hamburger menu) */
+.mobile-menu-toggle {
+    display: none;
+    background: none;
+    border: none;
+    color: var(--white);
+    font-size: 20px;
+    cursor: pointer;
+    padding: 8px;
+}
+
+@media (max-width: 768px) {
+    .mobile-menu-toggle {
+        display: block;
+    }
+}
+
+/* Swipe Gestures Support */
+.swipe-container {
+    touch-action: pan-x;
+    overflow-x: auto;
+    -webkit-overflow-scrolling: touch;
+    scrollbar-width: none;
+    -ms-overflow-style: none;
+}
+
+.swipe-container::-webkit-scrollbar {
+    display: none;
+}
