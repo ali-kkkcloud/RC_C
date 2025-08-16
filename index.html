@@ -3,122 +3,621 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <meta name="description" content="Employee Portal - Secure login to access your employee dashboard, attendance, tasks, and training.">
+    <meta name="robots" content="noindex, nofollow">
     <title>Employee Portal - Login</title>
+    
+    <!-- Favicon -->
+    <link rel="icon" type="image/x-icon" href="data:image/svg+xml,<svg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 100 100'><text y='.9em' font-size='90'>🏢</text></svg>">
+    
+    <!-- Stylesheets -->
     <link rel="stylesheet" href="css/style.css">
     <link rel="stylesheet" href="css/mobile.css">
     <link href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0/css/all.min.css" rel="stylesheet">
+    
+    <!-- Preload critical resources -->
+    <link rel="preload" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0/css/all.min.css" as="style">
 </head>
 <body class="login-page">
+    <!-- Skip to main content for accessibility -->
+    <a href="#main-content" class="sr-only sr-only-focusable">Skip to main content</a>
+    
+    <!-- Main login container -->
     <div class="login-container">
         <div class="login-box">
+            <!-- Login header -->
             <div class="login-header">
                 <div class="logo">
-                    <i class="fas fa-building"></i>
+                    <i class="fas fa-building" aria-hidden="true"></i>
                     <h1>EMPLOYEE PORTAL</h1>
                 </div>
-                <p>Welcome back! Please sign in to your account</p>
+                <p class="login-subtitle">Welcome back! Please sign in to your account</p>
             </div>
 
-            <form id="loginForm" class="login-form">
-                <div class="form-group">
-                    <label for="email">Email Address</label>
-                    <input type="email" id="email" name="email" required>
-                    <i class="fas fa-envelope"></i>
-                </div>
+            <!-- Login form -->
+            <main id="main-content">
+                <form id="loginForm" class="login-form" novalidate>
+                    <div class="form-group">
+                        <label for="email">Email Address</label>
+                        <div class="input-container">
+                            <input 
+                                type="email" 
+                                id="email" 
+                                name="email" 
+                                class="form-control"
+                                required 
+                                autocomplete="email"
+                                placeholder="Enter your email address"
+                                aria-describedby="email-error"
+                            >
+                            <i class="fas fa-envelope input-icon" aria-hidden="true"></i>
+                        </div>
+                        <div id="email-error" class="error-message" role="alert" aria-live="polite"></div>
+                    </div>
 
-                <div class="form-group">
-                    <label for="password">Password</label>
-                    <input type="password" id="password" name="password" required>
-                    <i class="fas fa-lock"></i>
-                    <button type="button" class="toggle-password" onclick="togglePassword()">
-                        <i class="fas fa-eye"></i>
-                    </button>
-                </div>
+                    <div class="form-group">
+                        <label for="password">Password</label>
+                        <div class="input-container">
+                            <input 
+                                type="password" 
+                                id="password" 
+                                name="password" 
+                                class="form-control"
+                                required 
+                                autocomplete="current-password"
+                                placeholder="Enter your password"
+                                aria-describedby="password-error"
+                            >
+                            <i class="fas fa-lock input-icon" aria-hidden="true"></i>
+                            <button 
+                                type="button" 
+                                class="toggle-password" 
+                                onclick="togglePassword()"
+                                aria-label="Toggle password visibility"
+                                tabindex="0"
+                            >
+                                <i class="fas fa-eye" aria-hidden="true"></i>
+                            </button>
+                        </div>
+                        <div id="password-error" class="error-message" role="alert" aria-live="polite"></div>
+                    </div>
 
-                <div class="form-options">
-                    <label class="checkbox">
-                        <input type="checkbox" id="rememberMe">
-                        <span class="checkmark"></span>
-                        Remember me
-                    </label>
-                    <a href="#" class="forgot-password">Forgot password?</a>
-                </div>
-
-                <button type="submit" class="login-btn" id="loginBtn">
-                    <span>Sign In</span>
-                    <i class="fas fa-arrow-right"></i>
-                </button>
-
-                <div class="demo-accounts">
-                    <h3>Demo Accounts:</h3>
-                    <div class="demo-buttons">
-                        <button type="button" class="demo-btn" onclick="fillDemoEmployee()">
-                            <i class="fas fa-user"></i> Employee Demo
-                        </button>
-                        <button type="button" class="demo-btn" onclick="fillDemoAdmin()">
-                            <i class="fas fa-user-shield"></i> Admin Demo
+                    <div class="form-options">
+                        <label class="checkbox">
+                            <input type="checkbox" id="rememberMe" name="rememberMe">
+                            <span class="checkmark" aria-hidden="true"></span>
+                            Remember me
+                        </label>
+                        <button type="button" class="forgot-password" onclick="showForgotPassword()">
+                            Forgot password?
                         </button>
                     </div>
-                </div>
-            </form>
 
+                    <button type="submit" class="login-btn" id="loginBtn">
+                        <span>Sign In</span>
+                        <i class="fas fa-arrow-right" aria-hidden="true"></i>
+                    </button>
+
+                    <!-- Demo accounts section -->
+                    <div class="demo-accounts">
+                        <h3>Demo Accounts</h3>
+                        <p class="demo-description">Try the system with these demo accounts:</p>
+                        <div class="demo-buttons">
+                            <button type="button" class="demo-btn" onclick="fillDemoEmployee()">
+                                <i class="fas fa-user" aria-hidden="true"></i> 
+                                Employee Demo
+                                <small>employee@demo.com</small>
+                            </button>
+                            <button type="button" class="demo-btn" onclick="fillDemoAdmin()">
+                                <i class="fas fa-user-shield" aria-hidden="true"></i> 
+                                Admin Demo
+                                <small>admin@demo.com</small>
+                            </button>
+                        </div>
+                    </div>
+                </form>
+            </main>
+
+            <!-- Login footer -->
             <div class="login-footer">
                 <p>&copy; 2024 Employee Management System. All rights reserved.</p>
+                <div class="footer-links">
+                    <button type="button" onclick="showPrivacyPolicy()" class="footer-link">Privacy Policy</button>
+                    <button type="button" onclick="showTermsOfService()" class="footer-link">Terms of Service</button>
+                    <button type="button" onclick="showHelp()" class="footer-link">Help</button>
+                </div>
             </div>
         </div>
     </div>
 
     <!-- Loading overlay -->
-    <div id="loadingOverlay" class="loading-overlay">
-        <div class="spinner"></div>
-        <p>Signing you in...</p>
+    <div id="loadingOverlay" class="loading-overlay" role="status" aria-label="Loading">
+        <div class="loading-content">
+            <div class="spinner" aria-hidden="true"></div>
+            <p>Signing you in...</p>
+        </div>
     </div>
 
-    <!-- Supabase CDN -->
-    <script src="https://unpkg.com/@supabase/supabase-js@2"></script>
-    <script src="js/supabase-config.js"></script>
-    <script src="js/auth.js"></script>
-    <script src="js/utils.js"></script>
+    <!-- Error modal -->
+    <div id="errorModal" class="modal-overlay" style="display: none;" role="dialog" aria-labelledby="error-title" aria-modal="true">
+        <div class="modal-content">
+            <div class="modal-header">
+                <h3 id="error-title">Error</h3>
+                <button class="modal-close" onclick="closeErrorModal()" aria-label="Close error dialog">
+                    <i class="fas fa-times" aria-hidden="true"></i>
+                </button>
+            </div>
+            <div class="modal-body">
+                <div class="error-content">
+                    <i class="fas fa-exclamation-triangle error-icon" aria-hidden="true"></i>
+                    <p id="error-message">An error occurred. Please try again.</p>
+                </div>
+                <div class="error-actions">
+                    <button class="btn btn-primary" onclick="closeErrorModal()">OK</button>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- Forgot password modal -->
+    <div id="forgotPasswordModal" class="modal-overlay" style="display: none;" role="dialog" aria-labelledby="forgot-title" aria-modal="true">
+        <div class="modal-content">
+            <div class="modal-header">
+                <h3 id="forgot-title">Reset Password</h3>
+                <button class="modal-close" onclick="closeForgotPasswordModal()" aria-label="Close password reset dialog">
+                    <i class="fas fa-times" aria-hidden="true"></i>
+                </button>
+            </div>
+            <div class="modal-body">
+                <form id="forgotPasswordForm">
+                    <div class="form-group">
+                        <label for="resetEmail">Email Address</label>
+                        <input 
+                            type="email" 
+                            id="resetEmail" 
+                            name="resetEmail" 
+                            class="form-control" 
+                            required 
+                            placeholder="Enter your email address"
+                        >
+                    </div>
+                    <div class="form-actions">
+                        <button type="button" class="btn btn-outline" onclick="closeForgotPasswordModal()">Cancel</button>
+                        <button type="submit" class="btn btn-primary">Send Reset Email</button>
+                    </div>
+                </form>
+            </div>
+        </div>
+    </div>
+
+    <!-- Scripts -->
+    <script src="https://unpkg.com/@supabase/supabase-js@2" onerror="handleScriptError('Supabase')"></script>
+    <script src="js/supabase-config.js" onerror="handleScriptError('Supabase Config')"></script>
+    <script src="js/utils.js" onerror="handleScriptError('Utils')"></script>
+    <script src="js/auth.js" onerror="handleScriptError('Auth')"></script>
 
     <script>
-        // Toggle password visibility
+        // Global error handling
+        window.onerror = function(message, source, lineno, colno, error) {
+            console.error('Global error:', message, source, lineno, colno, error);
+            showErrorMessage('An unexpected error occurred. Please refresh the page and try again.');
+            return true;
+        };
+
+        // Script loading error handler
+        function handleScriptError(scriptName) {
+            console.error(`Failed to load ${scriptName} script`);
+            showErrorMessage(`Failed to load required components. Please check your internet connection and refresh the page.`);
+        }
+
+        // Enhanced password visibility toggle
         function togglePassword() {
-            const passwordInput = document.getElementById('password');
-            const toggleBtn = document.querySelector('.toggle-password i');
-            
-            if (passwordInput.type === 'password') {
-                passwordInput.type = 'text';
-                toggleBtn.className = 'fas fa-eye-slash';
-            } else {
-                passwordInput.type = 'password';
-                toggleBtn.className = 'fas fa-eye';
+            try {
+                const passwordInput = document.getElementById('password');
+                const toggleBtn = document.querySelector('.toggle-password i');
+                
+                if (!passwordInput || !toggleBtn) {
+                    console.error('Password toggle elements not found');
+                    return;
+                }
+                
+                if (passwordInput.type === 'password') {
+                    passwordInput.type = 'text';
+                    toggleBtn.className = 'fas fa-eye-slash';
+                    toggleBtn.parentElement.setAttribute('aria-label', 'Hide password');
+                } else {
+                    passwordInput.type = 'password';
+                    toggleBtn.className = 'fas fa-eye';
+                    toggleBtn.parentElement.setAttribute('aria-label', 'Show password');
+                }
+            } catch (error) {
+                console.error('Password toggle error:', error);
             }
         }
 
-        // Fill demo employee credentials
+        // Enhanced demo account functions
         function fillDemoEmployee() {
-            document.getElementById('email').value = 'employee@demo.com';
-            document.getElementById('password').value = 'demo123';
-        }
-
-        // Fill demo admin credentials  
-        function fillDemoAdmin() {
-            document.getElementById('email').value = 'admin@demo.com';
-            document.getElementById('password').value = 'admin123';
-        }
-
-        // Check if already logged in
-        window.addEventListener('load', async () => {
-            const user = await getCurrentUser();
-            if (user) {
-                const role = localStorage.getItem('userRole');
-                if (role === 'admin') {
-                    window.location.href = 'admin-dashboard.html';
-                } else {
-                    window.location.href = 'employee-dashboard.html';
+            try {
+                const emailInput = document.getElementById('email');
+                const passwordInput = document.getElementById('password');
+                
+                if (emailInput && passwordInput) {
+                    emailInput.value = 'employee@demo.com';
+                    passwordInput.value = 'demo123';
+                    
+                    // Clear any previous errors
+                    clearFormErrors();
+                    
+                    // Focus the login button
+                    const loginBtn = document.getElementById('loginBtn');
+                    if (loginBtn) {
+                        loginBtn.focus();
+                    }
                 }
+            } catch (error) {
+                console.error('Fill demo employee error:', error);
+                showErrorMessage('Failed to fill demo credentials');
+            }
+        }
+
+        function fillDemoAdmin() {
+            try {
+                const emailInput = document.getElementById('email');
+                const passwordInput = document.getElementById('password');
+                
+                if (emailInput && passwordInput) {
+                    emailInput.value = 'admin@demo.com';
+                    passwordInput.value = 'admin123';
+                    
+                    // Clear any previous errors
+                    clearFormErrors();
+                    
+                    // Focus the login button
+                    const loginBtn = document.getElementById('loginBtn');
+                    if (loginBtn) {
+                        loginBtn.focus();
+                    }
+                }
+            } catch (error) {
+                console.error('Fill demo admin error:', error);
+                showErrorMessage('Failed to fill demo credentials');
+            }
+        }
+
+        // Form validation
+        function validateForm() {
+            try {
+                const email = document.getElementById('email').value.trim();
+                const password = document.getElementById('password').value;
+                let isValid = true;
+
+                // Clear previous errors
+                clearFormErrors();
+
+                // Email validation
+                if (!email) {
+                    showFieldError('email', 'Email address is required');
+                    isValid = false;
+                } else if (!isValidEmail(email)) {
+                    showFieldError('email', 'Please enter a valid email address');
+                    isValid = false;
+                }
+
+                // Password validation
+                if (!password) {
+                    showFieldError('password', 'Password is required');
+                    isValid = false;
+                } else if (password.length < 3) {
+                    showFieldError('password', 'Password must be at least 3 characters long');
+                    isValid = false;
+                }
+
+                return isValid;
+            } catch (error) {
+                console.error('Form validation error:', error);
+                return false;
+            }
+        }
+
+        function isValidEmail(email) {
+            const emailRegex = /^[^\s@]+@[^\s@]+\.[^\s@]+$/;
+            return emailRegex.test(email);
+        }
+
+        function showFieldError(fieldName, message) {
+            try {
+                const errorElement = document.getElementById(`${fieldName}-error`);
+                const inputElement = document.getElementById(fieldName);
+                
+                if (errorElement) {
+                    errorElement.textContent = message;
+                    errorElement.style.display = 'block';
+                }
+                
+                if (inputElement) {
+                    inputElement.classList.add('error');
+                    inputElement.setAttribute('aria-invalid', 'true');
+                }
+            } catch (error) {
+                console.error('Show field error:', error);
+            }
+        }
+
+        function clearFormErrors() {
+            try {
+                const errorElements = document.querySelectorAll('.error-message');
+                const inputElements = document.querySelectorAll('.form-control');
+                
+                errorElements.forEach(element => {
+                    element.textContent = '';
+                    element.style.display = 'none';
+                });
+                
+                inputElements.forEach(element => {
+                    element.classList.remove('error');
+                    element.removeAttribute('aria-invalid');
+                });
+            } catch (error) {
+                console.error('Clear form errors:', error);
+            }
+        }
+
+        // Enhanced error handling
+        function showErrorMessage(message) {
+            try {
+                const errorModal = document.getElementById('errorModal');
+                const errorMessageElement = document.getElementById('error-message');
+                
+                if (errorModal && errorMessageElement) {
+                    errorMessageElement.textContent = message;
+                    errorModal.style.display = 'flex';
+                    
+                    // Focus the modal for accessibility
+                    const closeBtn = errorModal.querySelector('.modal-close');
+                    if (closeBtn) {
+                        closeBtn.focus();
+                    }
+                } else {
+                    // Fallback to alert if modal not available
+                    alert(message);
+                }
+            } catch (error) {
+                console.error('Show error message error:', error);
+                alert(message); // Ultimate fallback
+            }
+        }
+
+        function closeErrorModal() {
+            try {
+                const errorModal = document.getElementById('errorModal');
+                if (errorModal) {
+                    errorModal.style.display = 'none';
+                }
+            } catch (error) {
+                console.error('Close error modal error:', error);
+            }
+        }
+
+        // Forgot password functionality
+        function showForgotPassword() {
+            try {
+                const forgotModal = document.getElementById('forgotPasswordModal');
+                const emailInput = document.getElementById('email');
+                const resetEmailInput = document.getElementById('resetEmail');
+                
+                if (forgotModal) {
+                    // Pre-fill with current email if available
+                    if (emailInput && resetEmailInput && emailInput.value.trim()) {
+                        resetEmailInput.value = emailInput.value.trim();
+                    }
+                    
+                    forgotModal.style.display = 'flex';
+                    
+                    // Focus the email input
+                    if (resetEmailInput) {
+                        resetEmailInput.focus();
+                    }
+                }
+            } catch (error) {
+                console.error('Show forgot password error:', error);
+            }
+        }
+
+        function closeForgotPasswordModal() {
+            try {
+                const forgotModal = document.getElementById('forgotPasswordModal');
+                if (forgotModal) {
+                    forgotModal.style.display = 'none';
+                }
+            } catch (error) {
+                console.error('Close forgot password modal error:', error);
+            }
+        }
+
+        // Footer link functions
+        function showPrivacyPolicy() {
+            try {
+                const policyContent = `
+                    <div class="policy-content">
+                        <h4>Privacy Policy</h4>
+                        <p>This Employee Management System respects your privacy and is committed to protecting your personal information.</p>
+                        <p><strong>Data Collection:</strong> We collect only necessary information for system functionality.</p>
+                        <p><strong>Data Usage:</strong> Your data is used solely for employee management purposes.</p>
+                        <p><strong>Data Security:</strong> We implement industry-standard security measures to protect your information.</p>
+                        <p><strong>Data Sharing:</strong> We do not share your personal information with third parties.</p>
+                        <p>For questions about this policy, please contact your system administrator.</p>
+                    </div>
+                `;
+                
+                if (window.UIUtils && typeof window.UIUtils.showModal === 'function') {
+                    window.UIUtils.showModal(policyContent, 'Privacy Policy');
+                } else {
+                    alert('Privacy Policy: This system respects your privacy and protects your personal information.');
+                }
+            } catch (error) {
+                console.error('Show privacy policy error:', error);
+            }
+        }
+
+        function showTermsOfService() {
+            try {
+                const termsContent = `
+                    <div class="terms-content">
+                        <h4>Terms of Service</h4>
+                        <p>By using this Employee Management System, you agree to the following terms:</p>
+                        <p><strong>Authorized Use:</strong> This system is for authorized employees only.</p>
+                        <p><strong>Account Security:</strong> You are responsible for maintaining the security of your account.</p>
+                        <p><strong>Acceptable Use:</strong> Use the system only for legitimate business purposes.</p>
+                        <p><strong>Data Accuracy:</strong> Ensure all information you provide is accurate and up-to-date.</p>
+                        <p><strong>Compliance:</strong> Follow all company policies and applicable laws when using this system.</p>
+                        <p>Violation of these terms may result in account suspension or termination.</p>
+                    </div>
+                `;
+                
+                if (window.UIUtils && typeof window.UIUtils.showModal === 'function') {
+                    window.UIUtils.showModal(termsContent, 'Terms of Service');
+                } else {
+                    alert('Terms of Service: Please use this system responsibly and in accordance with company policies.');
+                }
+            } catch (error) {
+                console.error('Show terms of service error:', error);
+            }
+        }
+
+        function showHelp() {
+            try {
+                const helpContent = `
+                    <div class="help-content">
+                        <h4>Login Help</h4>
+                        <p><strong>Demo Accounts:</strong> Use the demo buttons to try the system with sample data.</p>
+                        <p><strong>Forgot Password:</strong> Click "Forgot password?" to reset your password via email.</p>
+                        <p><strong>Login Issues:</strong> Ensure you're using the correct email and password. Check for caps lock.</p>
+                        <p><strong>Browser Compatibility:</strong> This system works best with modern browsers (Chrome, Firefox, Safari, Edge).</p>
+                        <p><strong>Accessibility:</strong> Use Tab to navigate, Enter to submit, and screen readers are supported.</p>
+                        <p><strong>Support:</strong> Contact your IT administrator for technical support or account issues.</p>
+                    </div>
+                `;
+                
+                if (window.UIUtils && typeof window.UIUtils.showModal === 'function') {
+                    window.UIUtils.showModal(helpContent, 'Help');
+                } else {
+                    alert('Help: Use demo accounts to try the system, or contact IT support for assistance.');
+                }
+            } catch (error) {
+                console.error('Show help error:', error);
+            }
+        }
+
+        // Enhanced form submission
+        document.addEventListener('DOMContentLoaded', function() {
+            try {
+                const loginForm = document.getElementById('loginForm');
+                const forgotPasswordForm = document.getElementById('forgotPasswordForm');
+                
+                // Login form submission
+                if (loginForm) {
+                    loginForm.addEventListener('submit', function(event) {
+                        event.preventDefault();
+                        
+                        if (validateForm()) {
+                            // The actual login handling is done by auth.js
+                            // This just ensures validation happens first
+                        }
+                    });
+                }
+
+                // Forgot password form submission
+                if (forgotPasswordForm) {
+                    forgotPasswordForm.addEventListener('submit', function(event) {
+                        event.preventDefault();
+                        
+                        const resetEmail = document.getElementById('resetEmail').value.trim();
+                        
+                        if (!resetEmail) {
+                            showErrorMessage('Please enter your email address');
+                            return;
+                        }
+                        
+                        if (!isValidEmail(resetEmail)) {
+                            showErrorMessage('Please enter a valid email address');
+                            return;
+                        }
+                        
+                        // Call the auth manager's reset password function
+                        if (window.authManager && typeof window.authManager.resetPassword === 'function') {
+                            window.authManager.resetPassword(resetEmail).then(success => {
+                                if (success) {
+                                    closeForgotPasswordModal();
+                                }
+                            });
+                        } else {
+                            showErrorMessage('Password reset functionality is not available');
+                        }
+                    });
+                }
+
+                // Keyboard accessibility improvements
+                document.addEventListener('keydown', function(event) {
+                    // Close modals with Escape key
+                    if (event.key === 'Escape') {
+                        closeErrorModal();
+                        closeForgotPasswordModal();
+                    }
+                });
+
+                // Auto-redirect if already logged in
+                checkExistingLogin();
+
+            } catch (error) {
+                console.error('DOM Content Loaded error:', error);
             }
         });
+
+        // Check for existing login
+        async function checkExistingLogin() {
+            try {
+                if (window.getCurrentUser && typeof window.getCurrentUser === 'function') {
+                    const user = await window.getCurrentUser();
+                    if (user) {
+                        const role = localStorage.getItem('userRole');
+                        if (role === 'admin') {
+                            window.location.href = 'admin-dashboard.html';
+                        } else {
+                            window.location.href = 'employee-dashboard.html';
+                        }
+                    }
+                }
+            } catch (error) {
+                console.error('Check existing login error:', error);
+            }
+        }
+
+        // Performance monitoring
+        window.addEventListener('load', function() {
+            try {
+                if ('performance' in window) {
+                    const loadTime = performance.now();
+                    console.log(`Page loaded in ${Math.round(loadTime)}ms`);
+                }
+            } catch (error) {
+                console.error('Performance monitoring error:', error);
+            }
+        });
+    </script>
+
+    <!-- Service Worker for offline functionality (optional) -->
+    <script>
+        if ('serviceWorker' in navigator) {
+            window.addEventListener('load', function() {
+                navigator.serviceWorker.register('/sw.js')
+                    .then(function(registration) {
+                        console.log('ServiceWorker registration successful');
+                    })
+                    .catch(function(error) {
+                        console.log('ServiceWorker registration failed');
+                    });
+            });
+        }
     </script>
 </body>
 </html>
