@@ -1,600 +1,1070 @@
 // File Name: js/notifications.js
-
-// Advanced Notification System
+// Advanced Notification System - FIXED VERSION
 
 class NotificationManager {
     constructor() {
         this.notifications = [];
+        this.container = null;
         this.settings = {
             position: 'top-right',
+            autoClose: true,
             duration: 5000,
             maxNotifications: 5,
-            enableSound: true,
-            enableDesktop: false
-        };
-        this.types = {
-            success: { icon: 'fas fa-check-circle', color: '#10B981' },
-            error: { icon: 'fas fa-times-circle', color: '#EF4444' },
-            warning: { icon: 'fas fa-exclamation-triangle', color: '#F59E0B' },
-            info: { icon: 'fas fa-info-circle', color: '#06B6D4' }
+            showProgress: true,
+            enableSound: false,
+            groupSimilar: true
         };
         
-        this.initializeNotifications();
+        this.initializeNotificationSystem();
     }
 
-    initializeNotifications() {
-        this.createNotificationContainer();
-        this.loadSettings();
-        this.requestDesktopPermission();
-        this.setupEventListeners();
-        this.startPeriodicCheck();
-    }
-
-    createNotificationContainer() {
-        if (document.getElementById('notificationContainer')) return;
-        
-        const container = document.createElement('div');
-        container.id = 'notificationContainer';
-        container.className = `notification-container ${this.settings.position}`;
-        document.body.appendChild(container);
-    }
-
-    loadSettings() {
-        const savedSettings = StorageUtils.getLocal('notification_settings');
-        if (savedSettings) {
-            this.settings = { ...this.settings, ...savedSettings };
+    initializeNotificationSystem() {
+        try {
+            this.createContainer();
+            this.loadSettings();
+            this.setupEventListeners();
+            this.startPeriodicChecks();
+            this.checkMissedNotifications();
+        } catch (error) {
+            console.error('Notification system initialization error:', error);
         }
     }
 
-    async requestDesktopPermission() {
-        if ('Notification' in window && Notification.permission === 'default') {
-            try {
-                const permission = await Notification.requestPermission();
-                this.settings.enableDesktop = permission === 'granted';
-            } catch (error) {
-                console.warn('Desktop notifications not supported:', error);
-                this.settings.enableDesktop = false;
+    createContainer() {
+        try {
+            // Remove existing container if it exists
+            const existingContainer = document.getElementById('notificationContainer');
+            if (existingContainer) {
+                existingContainer.remove();
             }
+
+            this.container = document.createElement('div');
+            this.container.id = 'notificationContainer';
+            this.container.className = `notification-container ${this.settings.position}`;
+            this.container.setAttribute('role', 'status');
+            this.container.setAttribute('aria-live', 'polite');
+            
+            // Add container styles
+            this.container.style.cssText = `
+                position: fixed;
+                z-index: 9999;
+                pointer-events: none;
+                max-width: 400px;
+                padding: 20px;
+            `;
+            
+            this.updateContainerPosition();
+            document.body.appendChild(this.container);
+        } catch (error) {
+            console.error('Create notification container error:', error);
+        }
+    }
+
+    updateContainerPosition() {
+        if (!this.container) return;
+
+        const positions = {
+            'top-right': { top: '0', right: '0' },
+            'top-left': { top: '0', left: '0' },
+            'bottom-right': { bottom: '0', right: '0' },
+            'bottom-left': { bottom: '0', left: '0' },
+            'top-center': { top: '0', left: '50%', transform: 'translateX(-50%)' },
+            'bottom-center': { bottom: '0', left: '50%', transform: 'translateX(-50%)' }
+        };
+
+        const position = positions[this.settings.position] || positions['top-right'];
+        
+        Object.assign(this.container.style, position);
+    }
+
+    loadSettings() {
+        try {
+            const savedSettings = StorageUtils.getLocal('notification_settings', {});
+            this.settings = { ...this.settings, ...savedSettings };
+            this.updateContainerPosition();
+        } catch (error) {
+            console.error('Load notification settings error:', error);
+        }
+    }
+
+    saveSettings() {
+        try {
+            StorageUtils.setLocal('notification_settings', this.settings);
+        } catch (error) {
+            console.error('Save notification settings error:', error);
         }
     }
 
     setupEventListeners() {
-        // Listen for system events that should trigger notifications
-        document.addEventListener('visibilitychange', () => {
-            if (document.visibilityState === 'visible') {
-                this.checkMissedNotifications();
-            }
-        });
+        try {
+            // Handle notification interactions
+            document.addEventListener('click', this.handleNotificationClick.bind(this));
+            
+            // Handle window focus for updating notification status
+            window.addEventListener('focus', this.handleWindowFocus.bind(this));
+            
+            // Handle system notifications
+            document.addEventListener('systemNotification', this.handleSystemNotification.bind(this));
+            
+            // Clean up expired notifications periodically
+            setInterval(() => {
+                this.cleanupExpiredNotifications();
+            }, 30000); // Every 30 seconds
 
-        // Listen for custom notification events
-        document.addEventListener('systemNotification', (event) => {
-            this.show(event.detail.message, event.detail.type, event.detail.options);
-        });
+        } catch (error) {
+            console.error('Event listener setup error:', error);
+        }
+    }
+
+    handleNotificationClick(event) {
+        try {
+            const notificationElement = event.target.closest('.notification-item');
+            if (!notificationElement) return;
+
+            const notificationId = notificationElement.dataset.notificationId;
+            const action = event.target.dataset.action;
+
+            switch (action) {
+                case 'close':
+                    this.close(notificationId);
+                    break;
+                case 'pin':
+                    this.pin(notificationId);
+                    break;
+                case 'action':
+                    this.executeAction(notificationId, event.target.dataset.actionId);
+                    break;
+                default:
+                    // Mark as read on click
+                    this.markAsRead(notificationId);
+            }
+        } catch (error) {
+            console.error('Notification click handler error:', error);
+        }
+    }
+
+    handleWindowFocus() {
+        try {
+            // Update last active time and check for new notifications
+            StorageUtils.setLocal('last_active_time', new Date().toISOString());
+            this.checkForNewNotifications();
+        } catch (error) {
+            console.error('Window focus handler error:', error);
+        }
+    }
+
+    handleSystemNotification(event) {
+        try {
+            const { message, type, options } = event.detail;
+            this.show(message, type, options);
+        } catch (error) {
+            console.error('System notification handler error:', error);
+        }
     }
 
     show(message, type = 'info', options = {}) {
-        const notification = this.createNotification(message, type, options);
-        this.addToContainer(notification);
-        this.playSound(type);
-        
-        if (this.settings.enableDesktop && document.visibilityState === 'hidden') {
-            this.showDesktopNotification(message, type);
-        }
+        try {
+            if (!message || typeof message !== 'string') {
+                console.warn('Invalid notification message');
+                return null;
+            }
 
-        // Auto remove after duration
-        if (options.duration !== 0) {
-            setTimeout(() => {
-                this.remove(notification.id);
-            }, options.duration || this.settings.duration);
-        }
+            const notification = this.createNotification(message, type, options);
+            
+            // Check for similar notifications if grouping is enabled
+            if (this.settings.groupSimilar) {
+                const similar = this.findSimilarNotification(notification);
+                if (similar) {
+                    return this.updateSimilarNotification(similar, notification);
+                }
+            }
 
-        return notification.id;
+            // Add to notifications array
+            this.notifications.unshift(notification);
+            
+            // Limit number of notifications
+            if (this.notifications.length > this.settings.maxNotifications) {
+                const removed = this.notifications.splice(this.settings.maxNotifications);
+                removed.forEach(n => this.removeFromDOM(n.id));
+            }
+
+            // Create DOM element and add to container
+            const element = this.createNotificationElement(notification);
+            notification.element = element;
+            
+            if (this.container) {
+                this.container.insertBefore(element, this.container.firstChild);
+                
+                // Trigger animation
+                requestAnimationFrame(() => {
+                    element.classList.add('notification-show');
+                });
+            }
+
+            // Save to history
+            this.saveToHistory(notification);
+
+            // Auto-close if enabled
+            if (this.settings.autoClose && !notification.persistent) {
+                this.scheduleAutoClose(notification);
+            }
+
+            // Play sound if enabled
+            if (this.settings.enableSound && notification.playSound !== false) {
+                this.playNotificationSound(type);
+            }
+
+            // Update badge count
+            this.updateNotificationBadge();
+
+            return notification.id;
+
+        } catch (error) {
+            console.error('Show notification error:', error);
+            return null;
+        }
     }
 
     createNotification(message, type, options) {
-        const id = StringUtils.generateId('notif');
-        const typeConfig = this.types[type] || this.types.info;
-        
         const notification = {
-            id,
-            message,
-            type,
-            timestamp: new Date(),
-            options: {
-                title: options.title || null,
-                persistent: options.persistent || false,
-                actions: options.actions || [],
-                data: options.data || {},
-                ...options
-            }
+            id: StringUtils.generateId('notif'),
+            message: StringUtils.escapeHtml(message),
+            type: type,
+            timestamp: new Date().toISOString(),
+            read: false,
+            persistent: options.persistent || false,
+            playSound: options.playSound !== false,
+            actions: options.actions || [],
+            data: options.data || {},
+            ...options
         };
 
-        const element = document.createElement('div');
-        element.className = `notification notification-${type}`;
-        element.setAttribute('data-id', id);
-        
-        element.innerHTML = `
-            <div class="notification-content">
-                <div class="notification-icon">
-                    <i class="${typeConfig.icon}"></i>
-                </div>
-                <div class="notification-body">
-                    ${notification.options.title ? `<div class="notification-title">${notification.options.title}</div>` : ''}
-                    <div class="notification-message">${message}</div>
-                    ${notification.options.actions.length > 0 ? this.renderActions(notification.options.actions, id) : ''}
-                </div>
-                <button class="notification-close" onclick="notificationManager.remove('${id}')">
-                    <i class="fas fa-times"></i>
-                </button>
-            </div>
-            <div class="notification-progress"></div>
-        `;
-
-        notification.element = element;
-        this.notifications.push(notification);
-        
         return notification;
     }
 
-    renderActions(actions, notificationId) {
-        return `
-            <div class="notification-actions">
-                ${actions.map(action => `
-                    <button class="notification-action" onclick="notificationManager.handleAction('${notificationId}', '${action.id}')">
-                        ${action.icon ? `<i class="${action.icon}"></i>` : ''}
-                        ${action.label}
-                    </button>
-                `).join('')}
-            </div>
-        `;
-    }
-
-    addToContainer(notification) {
-        const container = document.getElementById('notificationContainer');
-        if (!container) return;
-
-        // Remove excess notifications
-        const existing = container.children;
-        if (existing.length >= this.settings.maxNotifications) {
-            const oldest = existing[0];
-            this.remove(oldest.getAttribute('data-id'));
-        }
-
-        container.appendChild(notification.element);
-        
-        // Trigger animation
-        requestAnimationFrame(() => {
-            notification.element.classList.add('show');
-        });
-    }
-
-    remove(id) {
-        const notification = this.notifications.find(n => n.id === id);
-        if (!notification) return;
-
-        notification.element.classList.add('hide');
-        
-        setTimeout(() => {
-            if (notification.element.parentNode) {
-                notification.element.parentNode.removeChild(notification.element);
-            }
-            this.notifications = this.notifications.filter(n => n.id !== id);
-        }, 300);
-    }
-
-    clear() {
-        this.notifications.forEach(notification => {
-            this.remove(notification.id);
-        });
-    }
-
-    handleAction(notificationId, actionId) {
-        const notification = this.notifications.find(n => n.id === notificationId);
-        if (!notification) return;
-
-        const action = notification.options.actions.find(a => a.id === actionId);
-        if (action && action.handler) {
-            action.handler(notification.options.data);
-        }
-
-        // Remove notification after action
-        this.remove(notificationId);
-    }
-
-    playSound(type) {
-        if (!this.settings.enableSound) return;
-
+    createNotificationElement(notification) {
         try {
-            // Create audio context for different notification sounds
-            const audioContext = new (window.AudioContext || window.webkitAudioContext)();
-            const oscillator = audioContext.createOscillator();
-            const gainNode = audioContext.createGain();
+            const element = document.createElement('div');
+            element.className = `notification-item notification-${notification.type}`;
+            element.dataset.notificationId = notification.id;
+            element.setAttribute('role', 'alert');
+            element.style.pointerEvents = 'auto';
 
-            oscillator.connect(gainNode);
-            gainNode.connect(audioContext.destination);
+            const typeConfig = this.getTypeConfig(notification.type);
+            
+            element.innerHTML = `
+                <div class="notification-content">
+                    <div class="notification-header">
+                        <div class="notification-icon">
+                            <i class="${typeConfig.icon}"></i>
+                        </div>
+                        <div class="notification-meta">
+                            ${notification.title ? `<h4 class="notification-title">${notification.title}</h4>` : ''}
+                            <small class="notification-time">${DateTimeUtils.formatDate(notification.timestamp, 'relative')}</small>
+                        </div>
+                        <div class="notification-controls">
+                            ${!notification.persistent ? `
+                                <button class="notification-btn" data-action="close" title="Close">
+                                    <i class="fas fa-times"></i>
+                                </button>
+                            ` : `
+                                <button class="notification-btn" data-action="pin" title="Pin">
+                                    <i class="fas fa-thumbtack"></i>
+                                </button>
+                            `}
+                        </div>
+                    </div>
+                    
+                    <div class="notification-body">
+                        <p class="notification-message">${notification.message}</p>
+                        
+                        ${notification.actions && notification.actions.length > 0 ? `
+                            <div class="notification-actions">
+                                ${notification.actions.map(action => `
+                                    <button class="notification-action-btn" data-action="action" data-action-id="${action.id}">
+                                        ${action.icon ? `<i class="${action.icon}"></i>` : ''}
+                                        ${action.label}
+                                    </button>
+                                `).join('')}
+                            </div>
+                        ` : ''}
+                    </div>
+                    
+                    ${this.settings.showProgress && this.settings.autoClose && !notification.persistent ? `
+                        <div class="notification-progress">
+                            <div class="notification-progress-bar"></div>
+                        </div>
+                    ` : ''}
+                </div>
+            `;
 
-            // Different frequencies for different notification types
-            const frequencies = {
-                success: 800,
-                error: 400,
-                warning: 600,
-                info: 500
-            };
+            // Add styles
+            element.style.cssText = `
+                background: white;
+                border-left: 4px solid ${typeConfig.color};
+                border-radius: 8px;
+                box-shadow: 0 4px 12px rgba(0, 0, 0, 0.15);
+                margin-bottom: 12px;
+                padding: 16px;
+                opacity: 0;
+                transform: translateX(${this.settings.position.includes('right') ? '100%' : '-100%'});
+                transition: all 0.3s ease;
+                min-width: 300px;
+                max-width: 400px;
+                word-wrap: break-word;
+            `;
 
-            oscillator.frequency.setValueAtTime(frequencies[type] || 500, audioContext.currentTime);
-            oscillator.type = 'sine';
+            return element;
 
-            gainNode.gain.setValueAtTime(0.1, audioContext.currentTime);
-            gainNode.gain.exponentialRampToValueAtTime(0.01, audioContext.currentTime + 0.3);
-
-            oscillator.start();
-            oscillator.stop(audioContext.currentTime + 0.3);
         } catch (error) {
-            console.warn('Could not play notification sound:', error);
+            console.error('Create notification element error:', error);
+            return document.createElement('div');
         }
     }
 
-    showDesktopNotification(message, type) {
-        if (!('Notification' in window) || Notification.permission !== 'granted') return;
-
-        const options = {
-            body: message,
-            icon: '/assets/logo.png',
-            badge: '/assets/logo.png',
-            tag: `notification-${type}`,
-            requireInteraction: type === 'error'
+    getTypeConfig(type) {
+        const configs = {
+            success: {
+                icon: 'fas fa-check-circle',
+                color: '#10b981'
+            },
+            error: {
+                icon: 'fas fa-exclamation-circle',
+                color: '#ef4444'
+            },
+            warning: {
+                icon: 'fas fa-exclamation-triangle',
+                color: '#f59e0b'
+            },
+            info: {
+                icon: 'fas fa-info-circle',
+                color: '#3b82f6'
+            },
+            system: {
+                icon: 'fas fa-cog',
+                color: '#6b7280'
+            },
+            reminder: {
+                icon: 'fas fa-bell',
+                color: '#8b5cf6'
+            }
         };
 
-        const notification = new Notification('Employee Portal', options);
-        
-        notification.onclick = () => {
-            window.focus();
-            notification.close();
-        };
-
-        // Auto close desktop notification
-        setTimeout(() => {
-            notification.close();
-        }, this.settings.duration);
+        return configs[type] || configs.info;
     }
 
-    // Predefined notification types
-    success(message, options = {}) {
-        return this.show(message, 'success', options);
-    }
+    scheduleAutoClose(notification) {
+        try {
+            const duration = notification.duration || this.settings.duration;
+            
+            notification.closeTimeout = setTimeout(() => {
+                this.close(notification.id);
+            }, duration);
 
-    error(message, options = {}) {
-        return this.show(message, 'error', { ...options, duration: 8000 });
-    }
-
-    warning(message, options = {}) {
-        return this.show(message, 'warning', { ...options, duration: 6000 });
-    }
-
-    info(message, options = {}) {
-        return this.show(message, 'info', options);
-    }
-
-    // System-specific notifications
-    attendanceReminder() {
-        this.show('Don\'t forget to check in for your shift!', 'info', {
-            title: 'Shift Reminder',
-            actions: [{
-                id: 'checkin',
-                label: 'Check In Now',
-                icon: 'fas fa-sign-in-alt',
-                handler: () => {
-                    if (window.attendanceManager) {
-                        window.attendanceManager.checkIn();
-                    }
+            // Update progress bar if shown
+            if (this.settings.showProgress && notification.element) {
+                const progressBar = notification.element.querySelector('.notification-progress-bar');
+                if (progressBar) {
+                    progressBar.style.cssText = `
+                        width: 100%;
+                        height: 3px;
+                        background: rgba(0, 0, 0, 0.1);
+                        animation: notificationProgress ${duration}ms linear;
+                    `;
                 }
-            }]
-        });
-    }
-
-    taskDeadlineWarning(task) {
-        this.show(`Task "${task.title}" is due soon!`, 'warning', {
-            title: 'Task Deadline',
-            data: { taskId: task.id },
-            actions: [{
-                id: 'view',
-                label: 'View Task',
-                handler: (data) => {
-                    if (window.viewTaskDetails) {
-                        window.viewTaskDetails(data.taskId);
-                    }
-                }
-            }]
-        });
-    }
-
-    trainingAvailable(course) {
-        this.show(`New training course available: "${course.title}"`, 'info', {
-            title: 'Training Available',
-            data: { courseId: course.id },
-            actions: [{
-                id: 'start',
-                label: 'Start Now',
-                icon: 'fas fa-play',
-                handler: (data) => {
-                    if (window.startCourse) {
-                        window.startCourse(data.courseId);
-                    }
-                }
-            }]
-        });
-    }
-
-    systemMaintenance(maintenanceInfo) {
-        this.show('System maintenance scheduled. Please save your work.', 'warning', {
-            title: 'Maintenance Alert',
-            persistent: true,
-            data: maintenanceInfo,
-            actions: [{
-                id: 'dismiss',
-                label: 'Understood',
-                handler: () => {
-                    console.log('Maintenance notification acknowledged');
-                }
-            }]
-        });
-    }
-
-    // Batch notifications for multiple events
-    batchNotify(notifications) {
-        if (notifications.length === 0) return;
-
-        if (notifications.length === 1) {
-            const notif = notifications[0];
-            this.show(notif.message, notif.type, notif.options);
-            return;
+            }
+        } catch (error) {
+            console.error('Schedule auto close error:', error);
         }
-
-        // Group multiple notifications
-        const summary = `You have ${notifications.length} new notifications`;
-        this.show(summary, 'info', {
-            title: 'Multiple Updates',
-            actions: [{
-                id: 'viewAll',
-                label: 'View All',
-                handler: () => {
-                    this.showNotificationCenter(notifications);
-                }
-            }]
-        });
     }
 
-    showNotificationCenter(notifications = null) {
-        const notificationsToShow = notifications || this.getRecentNotifications();
-        
-        const modalContent = `
-            <div class="notification-center">
-                <div class="notification-center-header">
-                    <h3>Notification Center</h3>
-                    <button class="btn btn-sm btn-outline" onclick="notificationManager.clearAll()">
-                        Clear All
-                    </button>
-                </div>
-                <div class="notification-center-body">
-                    ${notificationsToShow.length === 0 ? 
-                        '<div class="empty-state">No notifications</div>' :
-                        notificationsToShow.map(notif => this.renderNotificationItem(notif)).join('')
-                    }
-                </div>
-            </div>
-        `;
+    close(notificationId) {
+        try {
+            const notification = this.notifications.find(n => n.id === notificationId);
+            if (!notification) return false;
 
-        UIUtils.showModal(modalContent, 'Notifications');
-    }
+            // Clear auto-close timeout
+            if (notification.closeTimeout) {
+                clearTimeout(notification.closeTimeout);
+            }
 
-    renderNotificationItem(notification) {
-        const typeConfig = this.types[notification.type];
-        return `
-            <div class="notification-item ${notification.read ? 'read' : 'unread'}">
-                <div class="notification-item-icon ${notification.type}">
-                    <i class="${typeConfig.icon}"></i>
-                </div>
-                <div class="notification-item-content">
-                    ${notification.options.title ? `<h4>${notification.options.title}</h4>` : ''}
-                    <p>${notification.message}</p>
-                    <small>${DateTimeUtils.formatDate(notification.timestamp)} ${DateTimeUtils.formatTime(notification.timestamp)}</small>
-                </div>
-                <div class="notification-item-actions">
-                    <button class="btn-icon" onclick="notificationManager.markAsRead('${notification.id}')">
-                        <i class="fas fa-check"></i>
-                    </button>
-                    <button class="btn-icon" onclick="notificationManager.removeStored('${notification.id}')">
-                        <i class="fas fa-trash"></i>
-                    </button>
-                </div>
-            </div>
-        `;
-    }
+            // Remove from DOM with animation
+            if (notification.element) {
+                notification.element.classList.add('notification-hide');
+                setTimeout(() => {
+                    this.removeFromDOM(notificationId);
+                }, 300);
+            }
 
-    // Notification history management
-    saveToHistory(notification) {
-        const history = StorageUtils.getLocal('notification_history', []);
-        history.unshift({
-            ...notification,
-            read: false,
-            element: null // Don't store DOM element
-        });
-        
-        // Keep only last 50 notifications
-        if (history.length > 50) {
-            history.splice(50);
+            // Remove from notifications array
+            this.notifications = this.notifications.filter(n => n.id !== notificationId);
+            
+            // Update badge count
+            this.updateNotificationBadge();
+
+            return true;
+        } catch (error) {
+            console.error('Close notification error:', error);
+            return false;
         }
-        
-        StorageUtils.setLocal('notification_history', history);
     }
 
-    getRecentNotifications(limit = 20) {
-        return StorageUtils.getLocal('notification_history', []).slice(0, limit);
+    closeAll() {
+        try {
+            const notificationIds = [...this.notifications.map(n => n.id)];
+            notificationIds.forEach(id => this.close(id));
+        } catch (error) {
+            console.error('Close all notifications error:', error);
+        }
     }
 
-    markAsRead(id) {
-        const history = StorageUtils.getLocal('notification_history', []);
-        const notification = history.find(n => n.id === id);
-        if (notification) {
+    removeFromDOM(notificationId) {
+        try {
+            if (this.container) {
+                const element = this.container.querySelector(`[data-notification-id="${notificationId}"]`);
+                if (element) {
+                    element.remove();
+                }
+            }
+        } catch (error) {
+            console.error('Remove from DOM error:', error);
+        }
+    }
+
+    pin(notificationId) {
+        try {
+            const notification = this.notifications.find(n => n.id === notificationId);
+            if (!notification) return false;
+
+            notification.persistent = true;
+            
+            // Clear auto-close timeout
+            if (notification.closeTimeout) {
+                clearTimeout(notification.closeTimeout);
+                notification.closeTimeout = null;
+            }
+
+            // Update DOM element
+            if (notification.element) {
+                const progressBar = notification.element.querySelector('.notification-progress');
+                if (progressBar) {
+                    progressBar.style.display = 'none';
+                }
+
+                const closeBtn = notification.element.querySelector('[data-action="close"]');
+                if (closeBtn) {
+                    closeBtn.innerHTML = '<i class="fas fa-thumbtack"></i>';
+                    closeBtn.dataset.action = 'unpin';
+                    closeBtn.title = 'Unpin';
+                }
+            }
+
+            return true;
+        } catch (error) {
+            console.error('Pin notification error:', error);
+            return false;
+        }
+    }
+
+    executeAction(notificationId, actionId) {
+        try {
+            const notification = this.notifications.find(n => n.id === notificationId);
+            if (!notification) return false;
+
+            const action = notification.actions.find(a => a.id === actionId);
+            if (!action) return false;
+
+            // Execute action callback if provided
+            if (typeof action.callback === 'function') {
+                action.callback(notification);
+            }
+
+            // Handle common actions
+            switch (action.type) {
+                case 'dismiss':
+                    this.close(notificationId);
+                    break;
+                case 'navigate':
+                    if (action.url) {
+                        window.location.href = action.url;
+                    }
+                    break;
+                case 'download':
+                    if (action.data) {
+                        downloadFile(action.data.content, action.data.filename, action.data.type);
+                    }
+                    break;
+            }
+
+            return true;
+        } catch (error) {
+            console.error('Execute action error:', error);
+            return false;
+        }
+    }
+
+    markAsRead(notificationId) {
+        try {
+            const notification = this.notifications.find(n => n.id === notificationId);
+            if (!notification) return false;
+
             notification.read = true;
-            StorageUtils.setLocal('notification_history', history);
+            
+            // Update history
+            const history = StorageUtils.getLocal('notification_history', []);
+            const historyItem = history.find(h => h.id === notificationId);
+            if (historyItem) {
+                historyItem.read = true;
+                StorageUtils.setLocal('notification_history', history);
+            }
+
+            // Update badge count
+            this.updateNotificationBadge();
+
+            return true;
+        } catch (error) {
+            console.error('Mark as read error:', error);
+            return false;
         }
-        this.updateNotificationBadge();
     }
 
-    removeStored(id) {
-        const history = StorageUtils.getLocal('notification_history', []);
-        const updatedHistory = history.filter(n => n.id !== id);
-        StorageUtils.setLocal('notification_history', updatedHistory);
-        this.updateNotificationBadge();
+    findSimilarNotification(newNotification) {
+        try {
+            return this.notifications.find(existing => 
+                existing.type === newNotification.type &&
+                existing.message === newNotification.message &&
+                (new Date() - new Date(existing.timestamp)) < 60000 // Within 1 minute
+            );
+        } catch (error) {
+            console.error('Find similar notification error:', error);
+            return null;
+        }
     }
 
-    clearAll() {
-        StorageUtils.removeLocal('notification_history');
-        this.clear();
-        this.updateNotificationBadge();
+    updateSimilarNotification(existing, newNotification) {
+        try {
+            // Update count if it exists
+            if (!existing.count) existing.count = 1;
+            existing.count++;
+
+            // Update timestamp
+            existing.timestamp = newNotification.timestamp;
+
+            // Update DOM element
+            if (existing.element) {
+                const messageElement = existing.element.querySelector('.notification-message');
+                if (messageElement) {
+                    messageElement.innerHTML = `${existing.message} <span class="notification-count">(${existing.count})</span>`;
+                }
+
+                const timeElement = existing.element.querySelector('.notification-time');
+                if (timeElement) {
+                    timeElement.textContent = DateTimeUtils.formatDate(existing.timestamp, 'relative');
+                }
+
+                // Re-trigger animation
+                existing.element.classList.remove('notification-show');
+                requestAnimationFrame(() => {
+                    existing.element.classList.add('notification-show');
+                });
+            }
+
+            return existing.id;
+        } catch (error) {
+            console.error('Update similar notification error:', error);
+            return null;
+        }
+    }
+
+    playNotificationSound(type) {
+        try {
+            // Create audio context if supported
+            if ('AudioContext' in window || 'webkitAudioContext' in window) {
+                const audioContext = new (window.AudioContext || window.webkitAudioContext)();
+                
+                // Generate different tones for different types
+                const frequencies = {
+                    success: 800,
+                    error: 400,
+                    warning: 600,
+                    info: 500,
+                    system: 300,
+                    reminder: 700
+                };
+
+                const frequency = frequencies[type] || frequencies.info;
+                const oscillator = audioContext.createOscillator();
+                const gainNode = audioContext.createGain();
+
+                oscillator.connect(gainNode);
+                gainNode.connect(audioContext.destination);
+
+                oscillator.frequency.setValueAtTime(frequency, audioContext.currentTime);
+                oscillator.type = 'sine';
+
+                gainNode.gain.setValueAtTime(0.1, audioContext.currentTime);
+                gainNode.gain.exponentialRampToValueAtTime(0.01, audioContext.currentTime + 0.3);
+
+                oscillator.start(audioContext.currentTime);
+                oscillator.stop(audioContext.currentTime + 0.3);
+            }
+        } catch (error) {
+            console.error('Play notification sound error:', error);
+        }
+    }
+
+    saveToHistory(notification) {
+        try {
+            const history = StorageUtils.getLocal('notification_history', []);
+            
+            // Remove element reference before saving
+            const historyItem = { ...notification };
+            delete historyItem.element;
+            delete historyItem.closeTimeout;
+            
+            history.unshift(historyItem);
+            
+            // Keep only last 100 notifications
+            if (history.length > 100) {
+                history.splice(100);
+            }
+            
+            StorageUtils.setLocal('notification_history', history);
+        } catch (error) {
+            console.error('Save to history error:', error);
+        }
+    }
+
+    getHistory(limit = 20) {
+        try {
+            return StorageUtils.getLocal('notification_history', []).slice(0, limit);
+        } catch (error) {
+            console.error('Get history error:', error);
+            return [];
+        }
+    }
+
+    clearHistory() {
+        try {
+            StorageUtils.removeLocal('notification_history');
+            this.updateNotificationBadge();
+        } catch (error) {
+            console.error('Clear history error:', error);
+        }
+    }
+
+    showNotificationCenter() {
+        try {
+            const history = this.getHistory(50);
+            
+            const centerContent = `
+                <div class="notification-center">
+                    <div class="notification-center-header">
+                        <h4>Notifications</h4>
+                        <div class="notification-center-actions">
+                            <button class="btn btn-sm btn-outline" onclick="notificationManager.markAllAsRead()">
+                                Mark All Read
+                            </button>
+                            <button class="btn btn-sm btn-outline" onclick="notificationManager.clearHistory()">
+                                Clear All
+                            </button>
+                        </div>
+                    </div>
+                    
+                    <div class="notification-center-body">
+                        ${history.length > 0 ? history.map(notification => `
+                            <div class="notification-history-item ${notification.read ? 'read' : 'unread'}">
+                                <div class="notification-history-icon ${notification.type}">
+                                    <i class="${this.getTypeConfig(notification.type).icon}"></i>
+                                </div>
+                                <div class="notification-history-content">
+                                    ${notification.title ? `<h5>${StringUtils.escapeHtml(notification.title)}</h5>` : ''}
+                                    <p>${notification.message}</p>
+                                    <small>${DateTimeUtils.formatDate(notification.timestamp, 'relative')}</small>
+                                </div>
+                                <div class="notification-history-actions">
+                                    <button class="btn-icon" onclick="notificationManager.markAsRead('${notification.id}')" title="Mark as read">
+                                        <i class="fas fa-check"></i>
+                                    </button>
+                                    <button class="btn-icon" onclick="notificationManager.removeFromHistory('${notification.id}')" title="Remove">
+                                        <i class="fas fa-trash"></i>
+                                    </button>
+                                </div>
+                            </div>
+                        `).join('') : '<div class="notification-center-empty">No notifications</div>'}
+                    </div>
+                </div>
+            `;
+
+            UIUtils.showModal(centerContent, 'Notification Center');
+        } catch (error) {
+            console.error('Show notification center error:', error);
+        }
+    }
+
+    markAllAsRead() {
+        try {
+            const history = StorageUtils.getLocal('notification_history', []);
+            history.forEach(notification => {
+                notification.read = true;
+            });
+            StorageUtils.setLocal('notification_history', history);
+            
+            this.notifications.forEach(notification => {
+                notification.read = true;
+            });
+            
+            this.updateNotificationBadge();
+        } catch (error) {
+            console.error('Mark all as read error:', error);
+        }
+    }
+
+    removeFromHistory(notificationId) {
+        try {
+            const history = StorageUtils.getLocal('notification_history', []);
+            const updatedHistory = history.filter(n => n.id !== notificationId);
+            StorageUtils.setLocal('notification_history', updatedHistory);
+            this.updateNotificationBadge();
+        } catch (error) {
+            console.error('Remove from history error:', error);
+        }
     }
 
     updateNotificationBadge() {
-        const unreadCount = this.getUnreadCount();
-        const badge = document.getElementById('notificationBadge');
-        
-        if (badge) {
-            if (unreadCount > 0) {
-                badge.textContent = unreadCount > 99 ? '99+' : unreadCount;
-                badge.style.display = 'block';
-            } else {
-                badge.style.display = 'none';
+        try {
+            const unreadCount = this.getUnreadCount();
+            const badge = document.getElementById('notificationBadge');
+            
+            if (badge) {
+                if (unreadCount > 0) {
+                    badge.textContent = unreadCount > 99 ? '99+' : unreadCount;
+                    badge.style.display = 'block';
+                } else {
+                    badge.style.display = 'none';
+                }
             }
+        } catch (error) {
+            console.error('Update notification badge error:', error);
         }
     }
 
     getUnreadCount() {
-        const history = StorageUtils.getLocal('notification_history', []);
-        return history.filter(n => !n.read).length;
-    }
-
-    // Periodic checks for new notifications
-    startPeriodicCheck() {
-        setInterval(() => {
-            this.checkForSystemNotifications();
-        }, 60000); // Check every minute
-
-        // Check immediately
-        setTimeout(() => {
-            this.checkForSystemNotifications();
-        }, 5000);
-    }
-
-    async checkForSystemNotifications() {
-        const userData = StorageUtils.getLocal('currentUser');
-        if (!userData) return;
-
         try {
-            // Check for shift reminders
-            this.checkShiftReminders();
-            
-            // Check for task deadlines
-            this.checkTaskDeadlines();
-            
-            // Check for training assignments
-            this.checkTrainingAssignments();
-            
-            // Update badge count
-            this.updateNotificationBadge();
-            
+            const history = StorageUtils.getLocal('notification_history', []);
+            return history.filter(n => !n.read).length;
         } catch (error) {
-            console.error('Error checking notifications:', error);
+            console.error('Get unread count error:', error);
+            return 0;
         }
     }
 
-    checkShiftReminders() {
-        const now = new Date();
-        const userData = StorageUtils.getLocal('currentUser');
-        
-        // Mock shift time check
-        const shiftStart = new Date();
-        shiftStart.setHours(9, 0, 0, 0); // 9 AM
-        
-        const timeDiff = shiftStart - now;
-        const minutesDiff = Math.floor(timeDiff / (1000 * 60));
-        
-        // Remind 30 minutes before shift
-        if (minutesDiff === 30) {
-            this.attendanceReminder();
+    startPeriodicChecks() {
+        try {
+            // Check for system notifications every minute
+            setInterval(() => {
+                this.checkSystemNotifications();
+            }, 60000);
+
+            // Initial check after 5 seconds
+            setTimeout(() => {
+                this.checkSystemNotifications();
+            }, 5000);
+        } catch (error) {
+            console.error('Start periodic checks error:', error);
+        }
+    }
+
+    checkSystemNotifications() {
+        try {
+            const userData = StorageUtils.getLocal('currentUser');
+            if (!userData) return;
+
+            // Check for various system notifications
+            this.checkTaskDeadlines();
+            this.checkMeetingReminders();
+            this.checkTrainingDue();
+            this.checkSystemUpdates();
+        } catch (error) {
+            console.error('Check system notifications error:', error);
         }
     }
 
     checkTaskDeadlines() {
-        if (!window.taskManager || !window.taskManager.tasks) return;
-        
-        const now = new Date();
-        const upcomingTasks = window.taskManager.tasks.filter(task => {
-            if (task.status === 'completed') return false;
-            
-            const dueDate = new Date(task.due_date);
-            const timeDiff = dueDate - now;
-            const hoursDiff = Math.floor(timeDiff / (1000 * 60 * 60));
-            
-            return hoursDiff <= 24 && hoursDiff > 0; // Due within 24 hours
-        });
+        try {
+            if (!window.taskManager || !window.taskManager.tasks) return;
 
-        upcomingTasks.forEach(task => {
-            const lastNotified = StorageUtils.getLocal(`task_deadline_notified_${task.id}`);
-            if (!lastNotified || (now - new Date(lastNotified)) > 24 * 60 * 60 * 1000) {
-                this.taskDeadlineWarning(task);
-                StorageUtils.setLocal(`task_deadline_notified_${task.id}`, now.toISOString());
-            }
-        });
+            const now = new Date();
+            const upcomingTasks = window.taskManager.tasks.filter(task => {
+                if (task.status === 'completed') return false;
+                
+                const dueDate = new Date(task.due_date);
+                const hoursUntilDue = (dueDate - now) / (1000 * 60 * 60);
+                
+                return hoursUntilDue > 0 && hoursUntilDue <= 24; // Due within 24 hours
+            });
+
+            upcomingTasks.forEach(task => {
+                const notificationId = `task_deadline_${task.id}`;
+                
+                // Check if we already sent this notification
+                const existing = this.notifications.find(n => n.id === notificationId);
+                if (existing) return;
+
+                const dueDate = new Date(task.due_date);
+                const hoursUntilDue = Math.round((dueDate - now) / (1000 * 60 * 60));
+
+                this.show(
+                    `Task "${task.title}" is due in ${hoursUntilDue} hours`,
+                    'warning',
+                    {
+                        id: notificationId,
+                        title: 'Task Deadline Reminder',
+                        persistent: true,
+                        actions: [
+                            {
+                                id: 'view_task',
+                                label: 'View Task',
+                                type: 'navigate',
+                                url: `tasks.html?task=${task.id}`
+                            },
+                            {
+                                id: 'dismiss',
+                                label: 'Dismiss',
+                                type: 'dismiss'
+                            }
+                        ]
+                    }
+                );
+            });
+        } catch (error) {
+            console.error('Check task deadlines error:', error);
+        }
     }
 
-    checkTrainingAssignments() {
-        // Mock training check
-        const lastTrainingCheck = StorageUtils.getLocal('last_training_check');
-        const now = new Date();
-        
-        if (!lastTrainingCheck || (now - new Date(lastTrainingCheck)) > 7 * 24 * 60 * 60 * 1000) {
-            // Check weekly for new training
-            StorageUtils.setLocal('last_training_check', now.toISOString());
+    checkMeetingReminders() {
+        try {
+            // Mock meeting reminder
+            const now = new Date();
+            const nextMeeting = new Date();
+            nextMeeting.setHours(now.getHours() + 1); // Mock meeting in 1 hour
+
+            const timeDiff = nextMeeting - now;
+            const minutesUntilMeeting = Math.round(timeDiff / (1000 * 60));
+
+            if (minutesUntilMeeting === 15) { // 15 minutes before
+                this.show(
+                    'You have a team meeting in 15 minutes',
+                    'reminder',
+                    {
+                        title: 'Meeting Reminder',
+                        persistent: true,
+                        actions: [
+                            {
+                                id: 'join_meeting',
+                                label: 'Join Meeting',
+                                type: 'navigate',
+                                url: 'https://meet.example.com/room'
+                            }
+                        ]
+                    }
+                );
+            }
+        } catch (error) {
+            console.error('Check meeting reminders error:', error);
+        }
+    }
+
+    checkTrainingDue() {
+        try {
+            if (!window.trainingManager) return;
+
+            // Check for training courses that need attention
+            const userData = StorageUtils.getLocal('currentUser');
+            if (!userData) return;
+
+            // Mock check for overdue training
+            const overdueTraining = StorageUtils.getLocal(`overdue_training_${userData.id}`, []);
+            
+            if (overdueTraining.length > 0) {
+                this.show(
+                    `You have ${overdueTraining.length} overdue training course(s)`,
+                    'warning',
+                    {
+                        title: 'Training Reminder',
+                        actions: [
+                            {
+                                id: 'view_training',
+                                label: 'View Training',
+                                type: 'navigate',
+                                url: 'training.html'
+                            }
+                        ]
+                    }
+                );
+            }
+        } catch (error) {
+            console.error('Check training due error:', error);
+        }
+    }
+
+    checkSystemUpdates() {
+        try {
+            // Mock system update notification
+            const lastUpdateCheck = StorageUtils.getLocal('last_update_check');
+            const now = new Date();
+            
+            if (!lastUpdateCheck || (now - new Date(lastUpdateCheck)) > 24 * 60 * 60 * 1000) { // 24 hours
+                StorageUtils.setLocal('last_update_check', now.toISOString());
+                
+                // Random chance of showing update notification (for demo)
+                if (Math.random() < 0.1) { // 10% chance
+                    this.show(
+                        'A new system update is available',
+                        'system',
+                        {
+                            title: 'System Update',
+                            actions: [
+                                {
+                                    id: 'update_now',
+                                    label: 'Update Now',
+                                    callback: () => {
+                                        this.show('System update completed!', 'success');
+                                    }
+                                },
+                                {
+                                    id: 'later',
+                                    label: 'Later',
+                                    type: 'dismiss'
+                                }
+                            ]
+                        }
+                    );
+                }
+            }
+        } catch (error) {
+            console.error('Check system updates error:', error);
         }
     }
 
     checkMissedNotifications() {
-        // Check for notifications that occurred while user was away
-        const lastActive = StorageUtils.getLocal('last_active_time');
-        if (!lastActive) return;
+        try {
+            const lastActiveTime = StorageUtils.getLocal('last_active_time');
+            if (!lastActiveTime) return;
 
-        const missedTime = new Date() - new Date(lastActive);
-        if (missedTime > 5 * 60 * 1000) { // More than 5 minutes away
-            this.info('Welcome back! Check for any updates while you were away.', {
-                title: 'You were away'
+            const lastActive = new Date(lastActiveTime);
+            const now = new Date();
+            const awayDuration = now - lastActive;
+
+            // If away for more than 30 minutes
+            if (awayDuration > 30 * 60 * 1000) {
+                this.show(
+                    'Welcome back! Check for any updates while you were away.',
+                    'info',
+                    {
+                        title: 'You were away',
+                        actions: [
+                            {
+                                id: 'check_updates',
+                                label: 'Check Updates',
+                                callback: () => {
+                                    this.checkForNewNotifications();
+                                }
+                            }
+                        ]
+                    }
+                );
+            }
+        } catch (error) {
+            console.error('Check missed notifications error:', error);
+        }
+    }
+
+    checkForNewNotifications() {
+        try {
+            // In a real implementation, this would check with the server
+            // For now, just refresh system checks
+            this.checkSystemNotifications();
+        } catch (error) {
+            console.error('Check for new notifications error:', error);
+        }
+    }
+
+    cleanupExpiredNotifications() {
+        try {
+            const now = new Date();
+            const expiredNotifications = this.notifications.filter(notification => {
+                const age = now - new Date(notification.timestamp);
+                return age > 24 * 60 * 60 * 1000 && !notification.persistent; // 24 hours
             });
+
+            expiredNotifications.forEach(notification => {
+                this.close(notification.id);
+            });
+        } catch (error) {
+            console.error('Cleanup expired notifications error:', error);
         }
     }
 
-    // Settings management
     updateSettings(newSettings) {
-        this.settings = { ...this.settings, ...newSettings };
-        StorageUtils.setLocal('notification_settings', this.settings);
-        
-        // Update container position if changed
-        const container = document.getElementById('notificationContainer');
-        if (container) {
-            container.className = `notification-container ${this.settings.position}`;
+        try {
+            this.settings = { ...this.settings, ...newSettings };
+            this.saveSettings();
+            
+            // Update container position if changed
+            if (this.container) {
+                this.container.className = `notification-container ${this.settings.position}`;
+                this.updateContainerPosition();
+            }
+        } catch (error) {
+            console.error('Update settings error:', error);
         }
     }
 
-    // Export notifications for backup
     exportNotifications() {
-        const history = StorageUtils.getLocal('notification_history', []);
-        const exportData = {
-            timestamp: new Date().toISOString(),
-            settings: this.settings,
-            notifications: history
-        };
-        
-        const filename = `notifications_export_${DateTimeUtils.formatDate(new Date(), 'YYYY-MM-DD')}.json`;
-        downloadFile(JSON.stringify(exportData, null, 2), filename, 'application/json');
+        try {
+            const history = StorageUtils.getLocal('notification_history', []);
+            const exportData = {
+                timestamp: new Date().toISOString(),
+                settings: this.settings,
+                notifications: history
+            };
+            
+            const filename = `notifications_export_${DateTimeUtils.formatDate(new Date(), 'YYYY-MM-DD')}.json`;
+            downloadFile(JSON.stringify(exportData, null, 2), filename, 'application/json');
+            
+            this.show('Notifications exported successfully!', 'success');
+        } catch (error) {
+            console.error('Export notifications error:', error);
+            this.show('Failed to export notifications', 'error');
+        }
+    }
+
+    // Cleanup method
+    destroy() {
+        try {
+            // Close all notifications
+            this.closeAll();
+            
+            // Remove container
+            if (this.container) {
+                this.container.remove();
+            }
+            
+            // Clear any pending timeouts
+            this.notifications.forEach(notification => {
+                if (notification.closeTimeout) {
+                    clearTimeout(notification.closeTimeout);
+                }
+            });
+            
+            // Remove event listeners
+            document.removeEventListener('click', this.handleNotificationClick);
+            window.removeEventListener('focus', this.handleWindowFocus);
+            document.removeEventListener('systemNotification', this.handleSystemNotification);
+        } catch (error) {
+            console.error('Cleanup error:', error);
+        }
     }
 }
 
@@ -603,15 +1073,20 @@ let notificationManager;
 
 // Initialize notification manager
 document.addEventListener('DOMContentLoaded', () => {
-    notificationManager = new NotificationManager();
-    
-    // Store last active time
-    StorageUtils.setLocal('last_active_time', new Date().toISOString());
-    
-    // Update last active time periodically
-    setInterval(() => {
+    try {
+        notificationManager = new NotificationManager();
+        window.notificationManager = notificationManager;
+        
+        // Store last active time
         StorageUtils.setLocal('last_active_time', new Date().toISOString());
-    }, 30000);
+        
+        // Update last active time periodically
+        setInterval(() => {
+            StorageUtils.setLocal('last_active_time', new Date().toISOString());
+        }, 30000);
+    } catch (error) {
+        console.error('Notification manager initialization error:', error);
+    }
 });
 
 // Override global showNotification function to use advanced notification manager
@@ -633,7 +1108,7 @@ window.toggleNotifications = function() {
 
 window.clearNotifications = function() {
     if (notificationManager) {
-        notificationManager.clearAll();
+        notificationManager.clearHistory();
     }
 };
 
@@ -644,5 +1119,41 @@ window.triggerSystemNotification = function(message, type, options) {
     });
     document.dispatchEvent(event);
 };
+
+// Add CSS animations
+const style = document.createElement('style');
+style.textContent = `
+    .notification-show {
+        opacity: 1 !important;
+        transform: translateX(0) !important;
+    }
+    
+    .notification-hide {
+        opacity: 0 !important;
+        transform: translateX(${window.innerWidth > 768 ? '100%' : '-100%'}) !important;
+    }
+    
+    @keyframes notificationProgress {
+        from { width: 100%; }
+        to { width: 0%; }
+    }
+    
+    .notification-item {
+        transition: all 0.3s ease;
+    }
+    
+    .notification-item:hover {
+        transform: translateY(-2px);
+        box-shadow: 0 6px 20px rgba(0, 0, 0, 0.2);
+    }
+`;
+document.head.appendChild(style);
+
+// Cleanup on page unload
+window.addEventListener('beforeunload', () => {
+    if (notificationManager && typeof notificationManager.destroy === 'function') {
+        notificationManager.destroy();
+    }
+});
 
 console.log('Advanced notification system loaded successfully');
